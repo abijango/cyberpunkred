@@ -5,5 +5,4 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
-/// WP-000 placeholder. Replaced once WP-001 lands the core identifier types.
-pub fn placeholder() {}
+pub mod types;

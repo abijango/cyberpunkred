@@ -9,3 +9,8 @@ repository.workspace = true
 
 [lib]
 path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+# `cpr_rules` does not generate UUIDs — callers pass them in. No `v4` feature.
+uuid = { version = "1", features = ["serde"] }
