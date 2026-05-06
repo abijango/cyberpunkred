@@ -5,4 +5,8 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
+pub mod dice;
+pub mod rng;
 pub mod types;
+
+pub use rng::Rng;
