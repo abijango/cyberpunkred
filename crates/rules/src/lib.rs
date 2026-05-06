@@ -11,5 +11,6 @@ pub mod effects;
 pub mod resolution;
 pub mod rng;
 pub mod types;
+pub mod world;
 
 pub use rng::Rng;
