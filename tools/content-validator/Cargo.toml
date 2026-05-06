@@ -1,0 +1,12 @@
+[package]
+name = "cpr_content_validator"
+description = "CLI: lint content/ for schema correctness."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "content-validator"
+path = "src/main.rs"

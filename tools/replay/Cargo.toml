@@ -1,0 +1,12 @@
+[package]
+name = "cpr_replay"
+description = "CLI: replay a deterministic game from seed and action log."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "replay"
+path = "src/main.rs"

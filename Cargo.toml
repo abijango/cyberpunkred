@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rules",
+    "crates/gm",
+    "crates/llm",
+    "crates/persistence",
+    "crates/server",
+    "crates/web",
+    "tools/content-validator",
+    "tools/replay",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+publish = false
+repository = "https://github.com/abijango/cyberpunkred"

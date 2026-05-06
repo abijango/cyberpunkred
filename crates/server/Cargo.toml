@@ -1,0 +1,11 @@
+[package]
+name = "cpr_server"
+description = "Axum backend: cloud LLM proxy and save sync. Native only."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[lib]
+path = "src/lib.rs"

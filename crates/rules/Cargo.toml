@@ -1,0 +1,11 @@
+[package]
+name = "cpr_rules"
+description = "Cyberpunk RED rules engine: pure logic, dice, combat, netrunning."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+repository.workspace = true
+
+[lib]
+path = "src/lib.rs"
