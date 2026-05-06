@@ -11,6 +11,7 @@
 use crate::dice::CritD10;
 use crate::rng::Rng;
 use crate::types::DV;
+use crate::world::World;
 use serde::{Deserialize, Serialize};
 
 /// Anything in the rules engine that produces a probabilistic outcome
@@ -102,14 +103,6 @@ impl CheckBreakdown {
         }
     }
 }
-
-/// Mutable game state passed to every [`Resolution::resolve`] call.
-///
-/// Currently a placeholder — fields will be populated by a later work package
-/// (the world container). Kept as a unit struct so downstream signatures can
-/// stabilise now without blocking on world implementation.
-#[derive(Debug, Default)]
-pub struct World;
 
 #[cfg(test)]
 mod tests {
@@ -216,7 +209,8 @@ mod tests {
 
     #[test]
     fn test_resolution_trait_can_be_implemented() {
-        let mut world = World;
+        let pc = crate::world::test_support::fresh_pc();
+        let mut world = World::new(pc);
         let mut rng = Rng::seed_from_u64(0);
         let mock = MockCheck {
             result: CheckBreakdown::new(5, 5, 0, 0, fake_normal_d10(5), DV::EVERYDAY),
