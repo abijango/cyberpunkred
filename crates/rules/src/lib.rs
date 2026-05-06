@@ -5,12 +5,9 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
-<<<<<<< wp-003-effect-system
-pub mod effects;
-=======
 pub mod dice;
+pub mod effects;
 pub mod rng;
->>>>>>> main
 pub mod types;
 
 pub use rng::Rng;
