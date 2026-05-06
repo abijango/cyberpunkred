@@ -14,3 +14,7 @@ path = "src/lib.rs"
 serde = { version = "1", features = ["derive"] }
 # `cpr_rules` does not generate UUIDs — callers pass them in. No `v4` feature.
 uuid = { version = "1", features = ["serde"] }
+# `os_rng` (default) pulls in `getrandom`, which complicates wasm32 builds.
+# Every roll site uses `Rng::seed_from_u64` — never OS entropy.
+rand = { version = "0.9", default-features = false, features = ["std"] }
+rand_chacha = { version = "0.9", default-features = false, features = ["std"] }
