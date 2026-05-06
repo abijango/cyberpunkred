@@ -1,0 +1,17 @@
+# Rulebook PDF — copyrighted, developer-provided, do not commit
+rulebook/*.pdf
+
+# Rust
+target/
+
+# WASM build artifacts
+crates/web/pkg/
+
+# Claude Code local-only settings (per-developer)
+.claude/settings.local.json
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
