@@ -5,4 +5,5 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
+pub mod effects;
 pub mod types;
