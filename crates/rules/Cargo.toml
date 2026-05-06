@@ -18,3 +18,7 @@ uuid = { version = "1", features = ["serde"] }
 # Every roll site uses `Rng::seed_from_u64` — never OS entropy.
 rand = { version = "0.9", default-features = false, features = ["std"] }
 rand_chacha = { version = "0.9", default-features = false, features = ["std"] }
+
+[dev-dependencies]
+# Round-trip serialization tests for resolution outcome envelopes.
+ron = "0.8"
