@@ -192,14 +192,26 @@ pub enum CriticalInjuryKind {
 
 /// Wound State per book p.186.
 ///
+/// `None` is the unwounded state at full HP — the rulebook table on p.186
+/// only defines wound states from "Less than Full HP" downward, so a
+/// character at maximum HP has *no* wound effect. Modeling that explicitly
+/// keeps query sites from having to reason about the absence of an entry.
+///
 /// `Dead` is the post-Mortally-Wounded state — when a Death Save fails
 /// (or HP drops to a negative value beyond what the rules allow recovery
 /// from). The plan classifies it as a Wound State for completeness.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, Default, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub enum WoundState {
+    /// Full HP — no wound effect. See p.186.
+    #[default]
+    None,
+    /// Less than Full HP — no penalty, but a Stabilization DV10 applies. See p.186.
     Lightly,
+    /// Less than 1/2 HP (round up) — `-2` to all Actions. See p.186.
     Seriously,
+    /// Less than 1 HP — `-4` to all Actions, `-6` to MOVE, Death Saves required. See p.186.
     Mortally,
+    /// Failed Death Save (or HP below recoverable bound). See p.186.
     Dead,
 }
 
