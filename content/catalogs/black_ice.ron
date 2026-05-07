@@ -1,0 +1,272 @@
+// Black ICE catalog — Cyberpunk RED (rulebook pp.205–207).
+//
+// One entry per Black ICE Program in the Black ICE Program Table on
+// pp.206–207. Demon-class Black ICE (p.205, p.212) live in
+// `content/catalogs/demons.ron` and are catalogued by WP-210; this file
+// must contain only Anti-Personnel and Anti-Program rows.
+//
+// Schema: every entry has
+//   slug: string             // catalog lookup key (lowercase, snake_case)
+//   id: BlackIceId(slug)     // wraps the slug — must match `slug`
+//   display_name: string     // book display name (preserves capitalisation)
+//   class: BlackIceClass     // AntiPersonnel | AntiProgram (no Demon here)
+//   per/spd/atk/def/rez: u8  // Black ICE Program Table columns (p.206)
+//   effect: BlackIceEffect   // closed-enum effect shape per pp.206-207
+//   icon: string             // cosmetic — the "Icon: …" footnote
+//   price: PriceTier         // (Costly) / (Premium) / (Expensive) / (V. Expensive)
+//   price_eb: Eurobucks(...) // must equal price.canonical_cost()
+//
+// Stat blocks below are transcribed verbatim from the rulebook table.
+BlackIceFile(
+    black_ice: [
+        // -- Anti-Personnel Black ICE (p.206 + p.207) --
+
+        // Asp — p.206. Destroys a random installed Program.
+        (
+            slug: "asp",
+            id: BlackIceId("asp"),
+            display_name: "Asp",
+            class: AntiPersonnel,
+            per: 4,
+            spd: 6,
+            atk: 2,
+            def: 2,
+            rez: 15,
+            effect: DestroyRandomProgram,
+            icon: "Golden Egyptian cobra, spitting beams of neon green light.",
+            price: Premium,
+            price_eb: (100),
+        ),
+
+        // Giant — p.206. 3d6 brain damage; forced unsafe Jack Out;
+        // suffer all remaining Rezzed Black ICE on the way out (not
+        // including the Giant itself).
+        (
+            slug: "giant",
+            id: BlackIceId("giant"),
+            display_name: "Giant",
+            class: AntiPersonnel,
+            per: 2,
+            spd: 2,
+            atk: 8,
+            def: 4,
+            rez: 25,
+            effect: BrainDamageAndForceJackOut(
+                dice: (n: 3, die: D6),
+                jackout_consequence: ForcedUnsafe,
+                applies_remaining_black_ice_on_exit: true,
+            ),
+            icon: "A massive pair of feet and ankles towering above the enemy Netrunner.",
+            price: VeryExpensive,
+            price_eb: (1000),
+        ),
+
+        // Hellhound — p.206. 2d6 brain damage; Cyberdeck catches fire,
+        // 2 HP per turn-end until a Meat Action puts it out;
+        // multiple instances cannot stack.
+        (
+            slug: "hellhound",
+            id: BlackIceId("hellhound"),
+            display_name: "Hellhound",
+            class: AntiPersonnel,
+            per: 6,
+            spd: 6,
+            atk: 6,
+            def: 2,
+            rez: 20,
+            effect: BrainDamageAndCyberdeckFire(
+                dice: (n: 2, die: D6),
+                burn_damage_per_turn_end: 2,
+                cannot_stack: true,
+            ),
+            icon: "A huge, black metal wolf. Its eyes glow white and fire runs in ripples all over its body. It speaks in a grating, metallic voice, repeating the enemy Netrunner's name.",
+            price: Expensive,
+            price_eb: (500),
+        ),
+
+        // Kraken — p.207. 3d6 brain damage; safe Jack Out blocked
+        // until end of next Turn (unsafe Jack Out still allowed).
+        (
+            slug: "kraken",
+            id: BlackIceId("kraken"),
+            display_name: "Kraken",
+            class: AntiPersonnel,
+            per: 6,
+            spd: 2,
+            atk: 8,
+            def: 4,
+            rez: 30,
+            effect: BrainDamageAndJackOutLock(
+                dice: (n: 3, die: D6),
+                jackout_consequence: SafeJackOutBlocked,
+            ),
+            icon: "A mass of thrashing, orange tentacles protruding from the walls. Their suckers are covered in sticky red goop.",
+            price: VeryExpensive,
+            price_eb: (1000),
+        ),
+
+        // Liche — p.207. INT, REF, DEX each lowered by 1d6 for the
+        // next hour (minimum 1).
+        (
+            slug: "liche",
+            id: BlackIceId("liche"),
+            display_name: "Liche",
+            class: AntiPersonnel,
+            per: 8,
+            spd: 2,
+            atk: 6,
+            def: 2,
+            rez: 25,
+            effect: StatPenaltyIntRefDex(
+                dice: (n: 1, die: D6),
+                minimum_stat: 1,
+            ),
+            icon: "Metallic skeleton draped in black robes. Its hands are studded with blackened rings that spark with electricity.",
+            price: Expensive,
+            price_eb: (500),
+        ),
+
+        // Raven — p.207. Derezzes a random Defender Program, then
+        // 1d6 brain damage.
+        (
+            slug: "raven",
+            id: BlackIceId("raven"),
+            display_name: "Raven",
+            class: AntiPersonnel,
+            per: 6,
+            spd: 4,
+            atk: 4,
+            def: 2,
+            rez: 15,
+            effect: DerezzRandomDefenderAndBrainDamage(
+                dice: (n: 1, die: D6),
+            ),
+            icon: "Raven adorned in plate armor wielding a glowing white lance.",
+            price: Costly,
+            price_eb: (50),
+        ),
+
+        // Scorpion — p.207. MOVE lowered by 1d6 for the next hour
+        // (minimum 1).
+        (
+            slug: "scorpion",
+            id: BlackIceId("scorpion"),
+            display_name: "Scorpion",
+            class: AntiPersonnel,
+            per: 2,
+            spd: 6,
+            atk: 2,
+            def: 2,
+            rez: 15,
+            effect: StatPenaltyMove(
+                dice: (n: 1, die: D6),
+                minimum_stat: 1,
+            ),
+            icon: "A tiny black scorpion that hisses very loudly whenever the enemy Netrunner speaks.",
+            price: Premium,
+            price_eb: (100),
+        ),
+
+        // Skunk — p.207. Slide Checks at -2 until Derezzed; multiple
+        // Skunks stack.
+        (
+            slug: "skunk",
+            id: BlackIceId("skunk"),
+            display_name: "Skunk",
+            class: AntiPersonnel,
+            per: 2,
+            spd: 4,
+            atk: 4,
+            def: 2,
+            rez: 10,
+            effect: SlideCheckPenalty(
+                penalty: 2,
+                stacks: true,
+            ),
+            icon: "Cartoon skunk that walks on its hind legs, following the Netrunner much too closely.",
+            price: Expensive,
+            price_eb: (500),
+        ),
+
+        // Wisp — p.207. 1d6 brain damage; -1 NET Action on next Turn
+        // (minimum 2).
+        (
+            slug: "wisp",
+            id: BlackIceId("wisp"),
+            display_name: "Wisp",
+            class: AntiPersonnel,
+            per: 4,
+            spd: 4,
+            atk: 4,
+            def: 2,
+            rez: 15,
+            effect: BrainDamageAndNetActionPenalty(
+                dice: (n: 1, die: D6),
+                action_penalty: 1,
+                minimum_actions: 2,
+            ),
+            icon: "Orb of light with a single minuscule eye crackling with energy.",
+            price: Costly,
+            price_eb: (50),
+        ),
+
+        // -- Anti-Program Black ICE (p.207) --
+
+        // Dragon — p.207. 6d6 to Program; Derezz becomes Destroy.
+        (
+            slug: "dragon",
+            id: BlackIceId("dragon"),
+            display_name: "Dragon",
+            class: AntiProgram,
+            per: 6,
+            spd: 4,
+            atk: 6,
+            def: 6,
+            rez: 30,
+            effect: ProgramDamageDestroyOnDerezz(
+                dice: (n: 6, die: D6),
+            ),
+            icon: "Golden-scaled dragon robot wreathed in electrical discharges.",
+            price: VeryExpensive,
+            price_eb: (1000),
+        ),
+
+        // Killer — p.207. 4d6 to Program; Derezz becomes Destroy.
+        (
+            slug: "killer",
+            id: BlackIceId("killer"),
+            display_name: "Killer",
+            class: AntiProgram,
+            per: 4,
+            spd: 8,
+            atk: 6,
+            def: 2,
+            rez: 20,
+            effect: ProgramDamageDestroyOnDerezz(
+                dice: (n: 4, die: D6),
+            ),
+            icon: "Robotic samurai with red eyes wielding a glowing katana.",
+            price: Expensive,
+            price_eb: (500),
+        ),
+
+        // Sabertooth — p.207. 6d6 to Program; Derezz becomes Destroy.
+        (
+            slug: "sabertooth",
+            id: BlackIceId("sabertooth"),
+            display_name: "Sabertooth",
+            class: AntiProgram,
+            per: 8,
+            spd: 6,
+            atk: 6,
+            def: 2,
+            rez: 25,
+            effect: ProgramDamageDestroyOnDerezz(
+                dice: (n: 6, die: D6),
+            ),
+            icon: "Immense hulking cat with glowing white tusks.",
+            price: VeryExpensive,
+            price_eb: (1000),
+        ),
+    ],
+)
