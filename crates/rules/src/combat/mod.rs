@@ -12,6 +12,7 @@
 //! - [`damage`] (WP-303) — damage pipeline and armor ablation.
 //! - [`dodge`] (WP-316) — REF≥8 dodge election helper.
 //! - [`explosives`] (WP-312) — grenade/rocket AoE resolution. See p.174.
+//! - [`grapple`] (WP-315) — grappling, throwing, choking. See pp.176–177.
 //! - [`grid`] (WP-302 placeholder) — 2D combat grid; replaced by WP-302.
 //! - [`melee`] (WP-307) — melee attack resolution (DEX + skill vs. defender).
 //! - [`ranged_single`] (WP-306) — single-shot ranged attack resolution.
@@ -25,6 +26,7 @@ pub mod critical_injury;
 pub mod damage;
 pub mod dodge;
 pub mod explosives;
+pub mod grapple;
 pub mod grid;
 pub mod melee;
 pub mod ranged_single;
