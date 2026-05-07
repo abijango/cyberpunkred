@@ -16,6 +16,7 @@ pub mod armor;
 pub mod cover;
 pub mod demons;
 pub mod drugs;
+pub mod programs;
 pub mod skills;
 pub mod vehicles;
 
