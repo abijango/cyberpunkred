@@ -12,6 +12,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub mod cover;
 pub mod demons;
 pub mod skills;
 

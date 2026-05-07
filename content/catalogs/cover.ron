@@ -1,0 +1,241 @@
+// Cover materials catalog — Cyberpunk RED rulebook p.183
+// (Cover Material and Thickness Examples). The underlying material/HP
+// matrix is on p.182 (Type of Cover); p.183 names 24 example objects and
+// pins each to a specific (material × thickness) cell of that matrix.
+//
+// Two RAW idiosyncrasies from p.183 are preserved verbatim rather than
+// normalised against p.182:
+//   1. Metal Door is listed as Thin Steel = 20 HP on p.183, even though
+//      the p.182 table gives Thin Steel as 25 HP. We honour the p.183
+//      value (20).
+//   2. Bulletproof Windshield is listed as "Thin or Thick Bulletproof
+//      Glass = 15 or 30 HP" on p.183. We catalog the canonical Thick
+//      form (30 HP); the `example` field documents the alternative.
+//
+// Schema: every entry has
+//   id: string             // catalog lookup key (snake_case)
+//   display_name: string   // book display string from p.183
+//   example: string        // free-form note, usually = display_name
+//   material: MaterialKind
+//   thickness: Thickness
+//   hp: u16                // rightmost column of p.183
+CoverFile(
+    covers: [
+        // -- Steel --
+        (
+            id: "bank_vault_door",
+            display_name: "Bank Vault Door",
+            example: "Bank Vault Door",
+            material: Steel,
+            thickness: Thick,
+            hp: 50,
+        ),
+        (
+            id: "car_door",
+            display_name: "Car Door",
+            example: "Car Door",
+            material: Steel,
+            thickness: Thin,
+            hp: 25,
+        ),
+        (
+            id: "engine_block",
+            display_name: "Engine Block",
+            example: "Engine Block",
+            material: Steel,
+            thickness: Thick,
+            hp: 50,
+        ),
+        (
+            id: "hydrant",
+            display_name: "Hydrant",
+            example: "Hydrant",
+            material: Steel,
+            thickness: Thick,
+            hp: 50,
+        ),
+        // RAW idiosyncrasy: p.183 lists Metal Door as Thin Steel = 20 HP
+        // even though the p.182 table gives Thin Steel as 25 HP. We honour
+        // the p.183 row (20) — the example is the source of truth.
+        (
+            id: "metal_door",
+            display_name: "Metal Door",
+            example: "Metal Door",
+            material: Steel,
+            thickness: Thin,
+            hp: 20,
+        ),
+        (
+            id: "refrigerator",
+            display_name: "Refrigerator",
+            example: "Refrigerator",
+            material: Steel,
+            thickness: Thin,
+            hp: 25,
+        ),
+        (
+            id: "shipping_container",
+            display_name: "Shipping Container",
+            example: "Shipping Container",
+            material: Steel,
+            thickness: Thin,
+            hp: 25,
+        ),
+
+        // -- Wood --
+        (
+            id: "bar",
+            display_name: "Bar",
+            example: "Bar",
+            material: Wood,
+            thickness: Thick,
+            hp: 20,
+        ),
+        (
+            id: "log_cabin_wall",
+            display_name: "Log Cabin Wall",
+            example: "Log Cabin Wall",
+            material: Wood,
+            thickness: Thick,
+            hp: 20,
+        ),
+        (
+            id: "overturned_table",
+            display_name: "Overturned Table",
+            example: "Overturned Table",
+            material: Wood,
+            thickness: Thin,
+            hp: 5,
+        ),
+        (
+            id: "tree",
+            display_name: "Tree",
+            example: "Tree",
+            material: Wood,
+            thickness: Thick,
+            hp: 20,
+        ),
+        (
+            id: "wardrobe",
+            display_name: "Wardrobe",
+            example: "Wardrobe",
+            material: Wood,
+            thickness: Thin,
+            hp: 5,
+        ),
+        (
+            id: "wooden_door",
+            display_name: "Wooden Door",
+            example: "Wooden Door",
+            material: Wood,
+            thickness: Thin,
+            hp: 5,
+        ),
+
+        // -- Stone --
+        (
+            id: "boulder",
+            display_name: "Boulder",
+            example: "Boulder",
+            material: Stone,
+            thickness: Thick,
+            hp: 40,
+        ),
+        (
+            id: "statue",
+            display_name: "Statue",
+            example: "Statue",
+            material: Stone,
+            thickness: Thin,
+            hp: 20,
+        ),
+
+        // -- Concrete --
+        (
+            id: "data_term",
+            display_name: "Data Term",
+            example: "Data Term",
+            material: Concrete,
+            thickness: Thick,
+            hp: 25,
+        ),
+        (
+            id: "utility_pole",
+            display_name: "Utility Pole",
+            example: "Utility Pole",
+            material: Concrete,
+            thickness: Thick,
+            hp: 25,
+        ),
+
+        // -- Bulletproof Glass --
+        (
+            id: "bank_window_glass",
+            display_name: "Bank Window Glass",
+            example: "Bank Window Glass",
+            material: BulletproofGlass,
+            thickness: Thick,
+            hp: 30,
+        ),
+        // p.183 lists Bulletproof Windshield as "Thin or Thick Bulletproof
+        // Glass = 15 or 30 HP". The catalog stores the canonical Thick
+        // form (30 HP); the example annotates the alternative.
+        (
+            id: "bulletproof_windshield",
+            display_name: "Bulletproof Windshield",
+            example: "Bulletproof Windshield (Thin or Thick — 15 or 30 HP per p.183)",
+            material: BulletproofGlass,
+            thickness: Thick,
+            hp: 30,
+        ),
+        (
+            id: "prison_visitation_glass",
+            display_name: "Prison Visitation Glass",
+            example: "Prison Visitation Glass",
+            material: BulletproofGlass,
+            thickness: Thin,
+            hp: 15,
+        ),
+
+        // -- Plaster/Foam/Plastic --
+        (
+            id: "office_wall",
+            display_name: "Office Wall",
+            example: "Office Wall",
+            material: PlasterFoamPlastic,
+            thickness: Thick,
+            hp: 15,
+        ),
+        (
+            id: "sofa",
+            display_name: "Sofa",
+            example: "Sofa",
+            material: PlasterFoamPlastic,
+            thickness: Thick,
+            hp: 15,
+        ),
+
+        // -- 0 HP "Not Cover" rows --
+        // p.183 prints both of these as "0 HP (Not Cover)" with no
+        // material/thickness column populated. We tag material as Other
+        // and thickness as Thin (the lower-HP column) by convention; the
+        // engine should treat hp == 0 as the determinant ("if it cannot
+        // stop a bullet, it provides no cover and thus has no HP" — p.182).
+        (
+            id: "office_cubicle",
+            display_name: "Office Cubicle",
+            example: "Office Cubicle (0 HP — Not Cover)",
+            material: Other,
+            thickness: Thin,
+            hp: 0,
+        ),
+        (
+            id: "windshield",
+            display_name: "Windshield",
+            example: "Windshield (0 HP — Not Cover)",
+            material: Glass,
+            thickness: Thin,
+            hp: 0,
+        ),
+    ],
+)
