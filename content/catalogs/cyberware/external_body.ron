@@ -1,0 +1,67 @@
+// External Body Cyberware (rulebook p.114 abbreviated, p.364 detailed).
+//
+// 7 External Body Option Slots are available; no foundational
+// prerequisite. Items consume slots category-globally (p.111).
+CyberwareFile(
+    cyberware: [
+        (
+            slug: "hidden_holster",
+            display_name: "Hidden Holster",
+            category: ExternalBody,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Holster inside the user's body can store a weapon already capable of concealment so that it can be successfully concealed without a roll. Weapon can be drawn from the hidden holster without an Action, as long as it is implanted in an easily accessible place on the user's body. See p.364.",
+        ),
+        (
+            slug: "skin_weave",
+            display_name: "Skin Weave",
+            category: ExternalBody,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            // SP7 armor across body and head — armor effects are
+            // catalog-level for the armor WP; we don't synthesize an
+            // ArmorPenalty modifier here.
+            effects: [],
+            description: "User's body and head are armored at SP7. Your SP in any location is determined by your highest source of SP in that location; whenever your armor is ablated in a location, all your sources of SP in that location are ablated at the same time. Whenever the user successfully completes a day of natural healing, nanomachines present in the Skin Weave repair both the body and head location of the Skin Weave for one point of its lost SP. See p.364.",
+        ),
+        (
+            slug: "subdermal_armor",
+            display_name: "Subdermal Armor",
+            category: ExternalBody,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "User's body and head are armored at SP11. Your SP in any location is determined by your highest source of SP in that location; whenever your armor is ablated in a location, all your sources of SP in that location are ablated at the same time. Whenever the user successfully completes a day of natural healing, nanomachines present in the Subdermal Armor repair both the body and head location of the Subdermal Armor for one point of its lost SP. See p.364.",
+        ),
+        (
+            slug: "subdermal_pocket",
+            display_name: "Subdermal Pocket",
+            category: ExternalBody,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 3, dice: (n: 1, die: D6, divisor: 1)),
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "2\"x4\" (5cm x 10cm) space with a RealSkinn zipper. Contents can be successfully concealed without a Check. See p.364.",
+        ),
+    ],
+)

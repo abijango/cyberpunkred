@@ -1,0 +1,94 @@
+// Borgware (rulebook p.116 abbreviated, p.367 detailed).
+//
+// Heavy body-replacement cyberware. Most Borgware items have explicit
+// prerequisites (other Borgware or Internal Body installations). Those
+// constraints are described in the entry text — the catalog enforces a
+// single `prerequisite_slug` (the most direct foundational dependency);
+// multi-prerequisite cases ("requires Grafted Muscle and Bone Lace
+// AND BODY 8") are checked by the install pipeline against the
+// description text.
+CyberwareFile(
+    cyberware: [
+        (
+            slug: "artificial_shoulder_mount",
+            display_name: "Artificial Shoulder Mount",
+            category: Borgware,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "User can mount 2 Cyberarms under first set of arms. User can only have one Artificial Shoulder Mount installed. See p.367.",
+        ),
+        (
+            slug: "implanted_linear_frame_sigma",
+            display_name: "Implanted Linear Frame Sigma",
+            category: Borgware,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            slot_cost: 1,
+            // Strict prerequisite is BODY 6 + Grafted Muscle and Bone
+            // Lace. We pick the cyberware prerequisite (the one this
+            // catalog can actually validate). The BODY 6 stat
+            // requirement is enforced by the install pipeline.
+            prerequisite_slug: Some("grafted_muscle_and_bone_lace"),
+            // BODY -> 12 (the increase, not a flat bonus). Modeled as
+            // StatBonus with the runtime install pipeline clamping to
+            // `min(13, current + by)` per p.367.
+            effects: [],
+            description: "An enhanced skeleton and support structure with hydraulic and myomar muscles. User increases their BODY to 12. This increase in BODY changes a Character's HP and Death Save. This cannot increase the user's BODY to 13 or higher. Installation requires BODY 6 and Grafted Muscle and Bone Lace. See p.367.",
+        ),
+        (
+            slug: "implanted_linear_frame_beta",
+            display_name: "Implanted Linear Frame Beta",
+            category: Borgware,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: Luxury,
+            price_eb: 5000,
+            option_slots: 0,
+            slot_cost: 1,
+            // Strict prerequisite is BODY 8 + Two Grafted Muscle and
+            // Bone Lace installations.
+            prerequisite_slug: Some("grafted_muscle_and_bone_lace"),
+            effects: [],
+            description: "A heavily enhanced skeleton and support structure with even more hydraulic and myomar muscles. User increases their BODY to 14. This increase in BODY changes a Character's HP and Death Save. This cannot increase the user's BODY to 15 or higher. Installation requires BODY 8 and Two Grafted Muscle and Bone Lace. See p.367.",
+        ),
+        (
+            slug: "multioptic_mount",
+            display_name: "MultiOptic Mount",
+            category: Borgware,
+            install_difficulty: Hospital,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "User can mount up to 5 additional Cybereyes into the MultiOptic Mount. Cybereyes sold and installed separately. User can only have one MultiOptic Mount installed. See p.367.",
+        ),
+        (
+            slug: "sensor_array",
+            display_name: "Sensor Array",
+            category: Borgware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            // Per p.367: "doesn't take up a Cyberaudio Option Slot." But
+            // it does require a Cyberaudio Suite.
+            slot_cost: 0,
+            prerequisite_slug: Some("cyberaudio_suite"),
+            effects: [],
+            description: "Twin flattened antennae protruding from the user's head improving their Cyberaudio Suite, sometimes referred to as 'Rabbit Ears.' User can install up to 5 additional Cyberaudio Options into their Cyberaudio Suite. User can only have one Sensor Array installed. Requires Cyberaudio Suite but doesn't take up a Cyberaudio Option Slot. See p.367.",
+        ),
+    ],
+)

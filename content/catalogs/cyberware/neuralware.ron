@@ -1,0 +1,199 @@
+// Neuralware (rulebook p.112 abbreviated, p.359-360 detailed).
+//
+// Foundational cyberware: Neural Link (5 Option Slots).
+// Chipware are sub-options that require Chipware Socket (which itself
+// requires Neural Link). Note p.359: "Chipware does not take up a Neural
+// Link Option Slot" — chipware lives in Chipware Sockets, of which a user
+// may install multiple, each paid for separately.
+CyberwareFile(
+    cyberware: [
+        // -- Foundational --
+        (
+            slug: "neural_link",
+            display_name: "Neural Link",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 5,
+            slot_cost: 0,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Wired artificial nervous system, required to use Neuralware and Subdermal Grips. System has 5 Option Slots for Neuralware options. See p.359.",
+        ),
+
+        // -- Neuralware options requiring Neural Link --
+        (
+            slug: "braindance_recorder",
+            display_name: "Braindance Recorder",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("neural_link"),
+            effects: [],
+            description: "Records braindance content to a standard Memory Chip or a linked Agent. Braindances can be viewed using a Braindance Viewer. Requires Neural Link. See p.359.",
+        ),
+        (
+            slug: "chipware_socket",
+            display_name: "Chipware Socket",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            // Per p.359: "Chipware does not take up a Neural Link Option Slot."
+            slot_cost: 0,
+            prerequisite_slug: Some("neural_link"),
+            effects: [],
+            description: "A single socket installed in the back of the neck that allows quick installation of a single piece of Chipware, of which there are many varieties. Installing or uninstalling Chipware is an Action. The first time you install a piece of Chipware you've never used before, you accrue Humanity Loss; re-installing already-used Chipware does not. Chipware does not take up a Neural Link Option Slot. Multiple sockets may be installed, each paid for individually. Requires Neural Link. See p.359.",
+        ),
+        (
+            slug: "interface_plugs",
+            display_name: "Interface Plugs",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("neural_link"),
+            effects: [],
+            description: "Plugs in the wrist or head that allow user to jack into and make use of Smartguns, Cyberdecks, heavy machinery, and drive vehicles with no hands. Multiple installations allow user to be plugged into multiple things at once. Requires Neural Link. See p.359.",
+        ),
+        (
+            slug: "kerenzikov",
+            display_name: "Kerenzikov",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            // Per the abbreviated table on p.112 the HL is "14 (4d6)".
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("neural_link"),
+            // Always-on Speedware: +2 Initiative Rolls (p.359).
+            effects: [InitiativeBonus(2)],
+            description: "Always-on Speedware that provides consistently improved reaction time. User adds +2 to their Initiative Rolls. Only a single piece of Speedware can be installed into a user at a time. Requires Neural Link. See p.359.",
+        ),
+        (
+            slug: "sandevistan",
+            display_name: "Sandevistan",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("neural_link"),
+            // Activated Speedware: +3 to next-minute Initiative when fired
+            // (1-hour cooldown) — *not* a passive ongoing modifier, so
+            // the effects list stays empty; the GM crate models the
+            // activation explicitly.
+            effects: [],
+            description: "Speedware that provides short boosts of highly improved reaction time. When activated as an Action, the user adds +3 to any Initiative Roll they make in the next minute, after which Sandevistan cannot be activated again for an hour. Only a single piece of Speedware can be installed into a user at a time. Requires Neural Link. See p.359.",
+        ),
+
+        // -- Chipware (require Chipware Socket) --
+        (
+            slug: "chemical_analyzer",
+            display_name: "Chemical Analyzer",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 3, dice: (n: 1, die: D6, divisor: 1)),
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            effects: [],
+            description: "Chipware. While installed into a Chipware Socket, allows user to test substances to find their precise chemical composition as an Action, identifying most substances instantly from a wide database of samples. Requires Chipware Socket. See p.359.",
+        ),
+        (
+            slug: "memory_chip",
+            display_name: "Memory Chip",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: None,
+            price: Cheap,
+            price_eb: 10,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            effects: [],
+            description: "Chipware. The standard for data storage. While installed into a Chipware Socket, the user's cyberware can store data on it or access data stored on it. Requires Chipware Socket. See p.359.",
+        ),
+        (
+            slug: "olfactory_boost",
+            display_name: "Olfactory Boost",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            effects: [],
+            description: "Chipware. While installed into a Chipware Socket, the user's sense of smell is boosted, allowing them to use the Tracking Skill to track scent in addition to visual clues. Requires Chipware Socket. See p.359.",
+        ),
+        (
+            slug: "pain_editor",
+            display_name: "Pain Editor",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 14, dice: (n: 4, die: D6, divisor: 1)),
+            price: VeryExpensive,
+            price_eb: 1000,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            // The "ignore Seriously Wounded" effect is a wound-state
+            // immunity, not a flat modifier the EffectModifier enum
+            // currently models — the WP's spec keeps `effects` open-ended
+            // so we leave this empty and let the wound-state code path
+            // consult the installed cyberware list directly.
+            effects: [],
+            description: "Chipware. While installed into a Chipware Socket, a Pain Editor shuts off the user's pain receptors dynamically, allowing them to ignore the effects of the Seriously Wounded Wound State. Requires Chipware Socket. See p.360.",
+        ),
+        (
+            slug: "skill_chip",
+            display_name: "Skill Chip",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            // Skill Chips are 500eb for normal Skills, 1,000eb for (×2)
+            // Skills (p.360). The catalog records the base 500eb cost; the
+            // purchase pipeline upcharges for (×2) chips.
+            price: Expensive,
+            price_eb: 500,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            effects: [],
+            description: "Chipware. While installed into a Chipware Socket, a Skill Chip makes the Skill it was made for trained for the user at +3, unless the user's Skill was already trained higher than +3 (in which case it does nothing). Skill Chips for (x2) cost Skills are 1,000eb; chips for all other Skills are 500eb. Requires Chipware Socket. See p.360.",
+        ),
+        (
+            slug: "tactile_boost",
+            display_name: "Tactile Boost",
+            category: Neuralware,
+            install_difficulty: Clinic,
+            humanity_loss: Rolled(fixed: 7, dice: (n: 2, die: D6, divisor: 1)),
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: Some("chipware_socket"),
+            effects: [],
+            description: "Chipware. While installed into a Chipware Socket, it boosts the user's sense of touch, allowing them to detect motion within 20m/yds of them, as long as their hand is touching a surface. While in use as a motion detector, that hand can't be used to do anything else. Requires Chipware Socket. See p.360.",
+        ),
+    ],
+)

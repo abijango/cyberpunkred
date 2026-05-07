@@ -16,6 +16,7 @@ pub mod armor;
 pub mod black_ice;
 pub mod cover;
 pub mod critical_injuries;
+pub mod cyberware;
 pub mod demons;
 pub mod drugs;
 pub mod lifepath;
