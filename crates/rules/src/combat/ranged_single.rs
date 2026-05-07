@@ -1222,6 +1222,220 @@ mod tests {
         ));
     }
 
+    // ---- WP-308 integration tests -------------------------------------------
+
+    /// WP-308 acceptance: `test_aimed_head_doubles_damage_through_head_sp`.
+    ///
+    /// Scenario (p.170): 10 raw damage dice, target head SP 4.
+    /// - Through-damage before doubling: 10 − 4 = 6.
+    /// - After doubling: 6 × 2 = 12 HP lost.
+    ///
+    /// We hunt for a seed where:
+    /// 1. The attack hits (REF 10 + Handgun 6 − 8 aimed = base 8 vs DV 13 →
+    ///    need d10_net ≥ 5).
+    /// 2. The two damage d6 rolls sum to exactly 10.
+    ///
+    /// Then we assert `hp_lost == 12` and `aimed_shot_effect == HeadDoubleDamage`.
+    /// See p.170.
+    #[test]
+    fn test_aimed_head_doubles_damage_through_head_sp() {
+        // Target has head SP 4 and 50 HP so it survives.
+        let (mut world, att_id, target_id) = world_with_attacker_and_target(10, 6, 5);
+        {
+            let npc = world.npcs.values_mut().next().unwrap();
+            npc.armor.head = Some(ArmorPiece {
+                kind: ArmorKind::Kevlar,
+                current_sp: 4,
+                max_sp: 4,
+            });
+            npc.wounds.max_hp = 50;
+            npc.wounds.current_hp = 50;
+        }
+
+        // Hunt for a seed where attack hits AND 2d6 sum == 10.
+        // REF 10 + Handgun 6 − 8 (aimed) = 8; vs DV 13 → d10_net ≥ 5.
+        // See p.170 for the −8 aimed shot penalty and head doubling rule.
+        let seed = (0u64..2_000_000)
+            .find(|&s| {
+                let mut r = Rng::seed_from_u64(s);
+                let att = d10_with_crits(&mut r);
+                if att.net < 5 {
+                    return false; // miss
+                }
+                // 2d6 damage rolls.
+                let d1 = crate::dice::d6(&mut r);
+                let d2 = crate::dice::d6(&mut r);
+                d1 + d2 == 10 // raw damage exactly 10
+            })
+            .expect("must find a seed with d10_net>=5 and 2d6==10");
+
+        let mut rng = Rng::seed_from_u64(seed);
+        let attack = RangedSingleAttack {
+            attacker: att_id,
+            target: target_id,
+            weapon: WeaponId("medium_pistol".into()),
+            weapon_data: medium_pistol(),
+            range_meters: 4,
+            aimed_shot: Some(AimedLocation::Head),
+            luck_to_spend: 0,
+            defender_dodges: false,
+            additional_modifiers: vec![],
+        };
+
+        let outcome = attack.resolve(&mut world, &mut rng).expect("must succeed");
+        assert!(outcome.hit, "attack must hit with this seed");
+        assert_eq!(
+            outcome.damage_total, 10,
+            "2d6 must sum to 10 with this seed"
+        );
+
+        // 10 raw − 4 head SP = 6 through; doubled → 12 HP lost. See p.170.
+        let actual_hp_lost = outcome.damage_outcome.as_ref().unwrap().hp_lost;
+        assert_eq!(
+            actual_hp_lost, 12,
+            "head aimed shot: 10 raw − 4 SP = 6 through × 2 = 12 HP lost (p.170)"
+        );
+        assert_eq!(
+            outcome.aimed_shot_effect,
+            Some(AimedShotEffect::HeadDoubleDamage),
+            "aimed_shot_effect must be HeadDoubleDamage (p.170)"
+        );
+    }
+
+    /// WP-308 acceptance: `test_aimed_held_item_drops_on_one_through`.
+    ///
+    /// Scenario (p.170): aimed at HeldItem, body SP = 1.
+    /// Any hit with 2d6 (minimum 2) guarantees ≥ 1 damage through SP.
+    /// The outcome must be `AimedShotEffect::DropHeldItem(_)`. See p.170.
+    ///
+    /// "If a single point of damage gets through your target's body armor, your
+    /// target drops one item of your choice held in their hands." — p.170.
+    #[test]
+    fn test_aimed_held_item_drops_on_one_through() {
+        // Target has body SP 1 so that any 2d6 (min 2) leaves ≥ 1 through.
+        // High HP so the target survives. See p.170.
+        let (mut world, att_id, target_id) = world_with_attacker_and_target(10, 6, 5);
+        {
+            let npc = world.npcs.values_mut().next().unwrap();
+            npc.armor.body = Some(ArmorPiece {
+                kind: ArmorKind::Kevlar,
+                current_sp: 1,
+                max_sp: 1,
+            });
+            npc.wounds.max_hp = 50;
+            npc.wounds.current_hp = 50;
+        }
+
+        // Hunt for a seed where the attack hits.
+        // REF 10 + Handgun 6 − 8 (aimed) = 8; vs DV 13 → d10_net ≥ 5.
+        // Body SP 1 and 2d6 min = 2, so damage always gets through on a hit.
+        let seed = (0u64..2_000_000)
+            .find(|&s| {
+                let mut r = Rng::seed_from_u64(s);
+                let att = d10_with_crits(&mut r);
+                att.net >= 5 // hit with aimed penalty
+            })
+            .expect("must find a hit seed");
+
+        let mut rng = Rng::seed_from_u64(seed);
+        let attack = RangedSingleAttack {
+            attacker: att_id,
+            target: target_id,
+            weapon: WeaponId("medium_pistol".into()),
+            weapon_data: medium_pistol(),
+            range_meters: 4,
+            aimed_shot: Some(AimedLocation::HeldItem),
+            luck_to_spend: 0,
+            defender_dodges: false,
+            additional_modifiers: vec![],
+        };
+
+        let outcome = attack.resolve(&mut world, &mut rng).expect("must succeed");
+        assert!(outcome.hit, "attack must hit with this seed");
+
+        let hp_lost = outcome.damage_outcome.as_ref().unwrap().hp_lost;
+        assert!(
+            hp_lost >= 1,
+            "with body SP 1 and 2d6 damage, at least 1 HP must be lost"
+        );
+
+        // A single point of damage through body armor → drop held item. See p.170.
+        assert!(
+            matches!(
+                outcome.aimed_shot_effect,
+                Some(AimedShotEffect::DropHeldItem(_))
+            ),
+            "HeldItem aimed shot with damage through SP must return DropHeldItem (p.170), got: {:?}",
+            outcome.aimed_shot_effect
+        );
+    }
+
+    /// WP-308 acceptance: `test_aimed_leg_breaks_on_one_through`.
+    ///
+    /// Scenario (p.170): aimed at Leg, body SP = 1.
+    /// Any hit with 2d6 (minimum 2) guarantees ≥ 1 damage through SP.
+    /// The outcome must be `AimedShotEffect::BrokenLeg`. See p.170.
+    ///
+    /// "If a single point of damage gets through your target's body armor, your
+    /// target also suffers the Broken Leg Critical Injury if they have any legs
+    /// left that aren't broken." — p.170.
+    #[test]
+    fn test_aimed_leg_breaks_on_one_through() {
+        // Target has body SP 1 so that any 2d6 (min 2) leaves ≥ 1 through.
+        // High HP so the target survives. See p.170.
+        let (mut world, att_id, target_id) = world_with_attacker_and_target(10, 6, 5);
+        {
+            let npc = world.npcs.values_mut().next().unwrap();
+            npc.armor.body = Some(ArmorPiece {
+                kind: ArmorKind::Kevlar,
+                current_sp: 1,
+                max_sp: 1,
+            });
+            npc.wounds.max_hp = 50;
+            npc.wounds.current_hp = 50;
+        }
+
+        // Hunt for a seed where the attack hits.
+        // REF 10 + Handgun 6 − 8 (aimed) = 8; vs DV 13 → d10_net ≥ 5.
+        // Body SP 1 and 2d6 min = 2, so damage always gets through on a hit.
+        let seed = (0u64..2_000_000)
+            .find(|&s| {
+                let mut r = Rng::seed_from_u64(s);
+                let att = d10_with_crits(&mut r);
+                att.net >= 5 // hit with aimed penalty
+            })
+            .expect("must find a hit seed");
+
+        let mut rng = Rng::seed_from_u64(seed);
+        let attack = RangedSingleAttack {
+            attacker: att_id,
+            target: target_id,
+            weapon: WeaponId("medium_pistol".into()),
+            weapon_data: medium_pistol(),
+            range_meters: 4,
+            aimed_shot: Some(AimedLocation::Leg),
+            luck_to_spend: 0,
+            defender_dodges: false,
+            additional_modifiers: vec![],
+        };
+
+        let outcome = attack.resolve(&mut world, &mut rng).expect("must succeed");
+        assert!(outcome.hit, "attack must hit with this seed");
+
+        let hp_lost = outcome.damage_outcome.as_ref().unwrap().hp_lost;
+        assert!(
+            hp_lost >= 1,
+            "with body SP 1 and 2d6 damage, at least 1 HP must be lost"
+        );
+
+        // A single point of damage through body armor → BrokenLeg. See p.170.
+        assert_eq!(
+            outcome.aimed_shot_effect,
+            Some(AimedShotEffect::BrokenLeg),
+            "Leg aimed shot with damage through SP must return BrokenLeg (p.170)"
+        );
+    }
+
     /// Regression: a miss produces hit=false, empty damage_rolls, None optionals.
     #[test]
     fn test_miss_produces_empty_damage_fields() {
