@@ -11,7 +11,11 @@
 //!   control nodes held, viruses queued. See pp.197–200.
 //! - [`abilities`] — Interface Abilities (Scanner, Backdoor, Cloak, etc.).
 //!   See pp.198–199.
+//! - [`programs`] — Program activation resolvers. [`programs::attackers`]
+//!   implements the "Use Program" NET Action for Attacker-class programs.
+//!   See pp.201–204.
 
 pub mod abilities;
 pub mod architecture;
+pub mod programs;
 pub mod state;

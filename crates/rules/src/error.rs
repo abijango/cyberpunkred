@@ -6,6 +6,7 @@
 //! pattern-match on the variant; the [`std::fmt::Display`] impl produces
 //! a human-readable message for logs / UI.
 
+use crate::effects::ProgramId;
 use crate::types::EntityId;
 use std::fmt;
 use std::path::PathBuf;
@@ -45,6 +46,57 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
+    /// A NET Action was attempted but no netrun is currently active on
+    /// `World::netrun`.
+    ///
+    /// The Netrunner must Jack In first (p.198) before any Interface
+    /// Ability (save Scanner) can be used.
+    ///
+    /// See p.198 (Jack In/Out).
+    NetrunNotActive,
+    /// A NET Action was attempted but the Netrunner has already consumed
+    /// all their NET Actions for this turn.
+    ///
+    /// See p.197 (NET Actions per turn table): the number of NET Actions is
+    /// determined by Interface rank.
+    NoNetActionsRemaining,
+    /// A Virus deployment was attempted but the Netrunner is not on the
+    /// bottom (deepest) floor of the NET Architecture.
+    ///
+    /// Per p.200: "Once you have reached the lowest level of the NET
+    /// Architecture you can leave your own Virus in the Architecture."
+    ///
+    /// See p.200 (Virus Interface Ability).
+    NotOnBottomFloor {
+        /// The floor the Netrunner is currently on (0-indexed from top).
+        current_floor: usize,
+        /// The index of the deepest revealed floor (`revealed_floors - 1`).
+        bottom_floor: usize,
+    },
+    /// A program slug was referenced but no entry with that slug exists in
+    /// the programs catalog (WP-208 / `content/catalogs/programs.ron`).
+    ///
+    /// Raised by [`crate::netrunning::programs::attackers::activate_attacker`]
+    /// when the requested program or target program slug is unknown.
+    ///
+    /// See p.201 (Programs).
+    ProgramNotFound(ProgramId),
+    /// An Attacker activation was requested for a program whose class is not
+    /// `AntiPersonnelAttacker` or `AntiProgramAttacker`.
+    ///
+    /// Booster and Defender programs are activated passively (they apply their
+    /// effect while Rezzed); they cannot be used as an Attacker. See p.202:
+    /// "The Three Kinds of Non-Black ICE Programs."
+    ///
+    /// See p.201, p.202.
+    WrongProgramClass {
+        /// The slug of the program that was rejected.
+        program: ProgramId,
+        /// Human-readable description of what class was expected.
+        expected: String,
+        /// Human-readable description of the class that was found.
+        found: String,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -63,6 +115,34 @@ impl fmt::Display for RulesError {
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
             }
+            RulesError::NetrunNotActive => {
+                write!(
+                    f,
+                    "no active netrun: must Jack In before using Interface Abilities"
+                )
+            }
+            RulesError::NoNetActionsRemaining => {
+                write!(f, "no NET Actions remaining this turn")
+            }
+            RulesError::NotOnBottomFloor {
+                current_floor,
+                bottom_floor,
+            } => write!(
+                f,
+                "cannot deploy Virus: at floor {current_floor}, but must be on the bottom floor {bottom_floor} (p.200)"
+            ),
+            RulesError::ProgramNotFound(id) => {
+                write!(f, "program not found in catalog: '{}'", id.0)
+            }
+            RulesError::WrongProgramClass {
+                program,
+                expected,
+                found,
+            } => write!(
+                f,
+                "program '{}' has wrong class: expected {expected}, found {found} (p.202)",
+                program.0
+            ),
         }
     }
 }
