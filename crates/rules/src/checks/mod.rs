@@ -12,6 +12,8 @@
 //! validation (p.130) and entity-lookup can fail before the dice are
 //! rolled — see [`crate::error::RulesError`].
 
+pub mod complementary;
 pub mod skill_check;
 
+pub use complementary::ComplementaryBonus;
 pub use skill_check::{NamedModifier, OpposedCheck, OpposedOutcome, SkillCheck};

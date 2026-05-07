@@ -20,6 +20,7 @@ pub use data::{
     Role, SkillSet, StatBlock, WeaponId, WornArmor, Wounds,
 };
 
+use crate::checks::ComplementaryBonus;
 use crate::effects::EffectStack;
 use crate::types::{CharacterId, Eurobucks};
 use serde::{Deserialize, Serialize};
@@ -74,6 +75,13 @@ pub struct Character {
     /// All transient and permanent effects on this character. See
     /// `IMPLEMENTATION_PLAN.md` §2.6.
     pub effects: EffectStack,
+    /// Pending one-shot Complementary Skill bonuses (rulebook p.130).
+    /// Each entry is consumed by the next [`crate::checks::SkillCheck`]
+    /// for its `target_skill`. Bonuses do not stack (p.130) — see
+    /// [`Self::add_complementary_bonus`]. `#[serde(default)]` keeps
+    /// pre-WP-102 saves loadable with an empty vec.
+    #[serde(default)]
+    pub complementary_bonuses: Vec<ComplementaryBonus>,
 }
 
 #[cfg(test)]
@@ -167,6 +175,7 @@ mod tests {
                 placeholder: "rogue_corporate_runaway".into(),
             },
             effects: stack,
+            complementary_bonuses: Vec::new(),
         }
     }
 
