@@ -4,11 +4,14 @@
 //! no validation hooks. Validation belongs to the GM layer / progression
 //! actions; query-time derivation belongs to a later WP.
 //!
-//! Several catalog-shaped types (`ArmorKind`, `Lifepath`, `WeaponId`) are
-//! placeholders following WP-003's precedent — string-newtype or
-//! `Placeholder(String)` shells that compile today and will be replaced by
-//! closed enums once the catalog WPs land.
+//! Several catalog-shaped types (`Lifepath`, `WeaponId`) are placeholders
+//! following WP-003's precedent — string-newtype or `Placeholder(String)`
+//! shells that compile today and will be replaced by closed enums once
+//! the catalog WPs land. `ArmorKind` was one such placeholder; WP-203
+//! has since replaced it with the closed enum re-exported from
+//! [`crate::catalog::armor`].
 
+pub use crate::catalog::armor::ArmorKind;
 use crate::effects::{CyberwareId, SkillId, WoundState};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -124,7 +127,8 @@ pub struct WornArmor {
 /// damaging hit that lands ablates by 1 until the armor is repaired.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ArmorPiece {
-    /// Catalog kind. Replaced by a closed enum in WP-203.
+    /// Closed-enum catalog kind. See [`crate::catalog::armor::ArmorKind`]
+    /// (WP-203, rulebook p.185).
     pub kind: ArmorKind,
     /// Current Stopping Power, after any ablation. See p.184.
     pub current_sp: u8,
@@ -204,18 +208,6 @@ pub enum AmmoKind {
     /// Slug rounds — explicitly named on p.344 alongside the pistol and
     /// rifle bullet variants.
     Slug,
-}
-
-/// Armor catalog kind.
-///
-/// **Stub.** WP-203 will replace this with a closed enum of the armor
-/// types listed on p.185 (Leathers through Metalgear®). Today it carries
-/// a free-form slug so test fixtures and other WPs can pin specific armor
-/// without blocking on the full catalog.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ArmorKind {
-    /// Stand-in until WP-203. Carries the catalog slug.
-    Placeholder(String),
 }
 
 /// Lifepath record.
