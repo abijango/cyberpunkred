@@ -15,6 +15,7 @@
 //! - [`grid`] (WP-302 placeholder) — 2D combat grid; replaced by WP-302.
 //! - [`melee`] (WP-307) — melee attack resolution (DEX + skill vs. defender).
 //! - [`ranged_single`] (WP-306) — single-shot ranged attack resolution.
+//! - [`shields`] (WP-314) — regular and human shields; shield HP interposition.
 //! - [`suppressive`] (WP-310) — suppressive fire: 10 bullets, WILL+Concentration check.
 //! - [`turn_engine`] (WP-301) — initiative rolling, queue management, round lifecycle.
 
@@ -27,6 +28,7 @@ pub mod explosives;
 pub mod grid;
 pub mod melee;
 pub mod ranged_single;
+pub mod shields;
 pub mod suppressive;
 pub mod turn_engine;
 
