@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub mod armor;
+pub mod black_ice;
 pub mod cover;
 pub mod demons;
 pub mod drugs;
