@@ -63,26 +63,34 @@ impl World {
 
     /// Resolve a grid [`EntityId`] to the underlying character, if any.
     ///
-    /// At this layer the only mapping known is *PC ↔ EntityId*, derived from
-    /// the PC's [`crate::types::CharacterId`] (same UUID, different newtype).
-    /// NPC entity-id resolution is a per-scene concern owned by combat:
-    /// when a combat encounter mints `EntityId`s for the participating NPCs,
-    /// it stores the `EntityId → NpcId` map inside [`CombatState`].
+    /// Lookup walks the PC first, then the NPC table. The mapping is by
+    /// UUID equality: an [`EntityId`] resolves to a [`Character`] iff the
+    /// underlying [`uuid::Uuid`] matches that character's
+    /// [`crate::types::CharacterId`] (PC) or its [`NpcId`] (NPC) — both of
+    /// which are different newtypes around the *same* UUID per WP-006's
+    /// design intent.
+    ///
+    /// Combat-engine code that mints fresh `EntityId`s for ad-hoc grid
+    /// participants (drones, summoned constructs) still owns its own
+    /// `EntityId → ...` map inside [`CombatState`]; this method covers the
+    /// common case where the entity is a known character.
     pub fn entity(&self, id: EntityId) -> Option<&Character> {
         if id.0 == self.pc.id.0 {
-            Some(&self.pc)
-        } else {
-            None
+            return Some(&self.pc);
         }
+        self.npcs
+            .iter()
+            .find_map(|(npc_id, c)| (npc_id.0 == id.0).then_some(c))
     }
 
     /// Mutable analogue of [`Self::entity`].
     pub fn entity_mut(&mut self, id: EntityId) -> Option<&mut Character> {
         if id.0 == self.pc.id.0 {
-            Some(&mut self.pc)
-        } else {
-            None
+            return Some(&mut self.pc);
         }
+        self.npcs
+            .iter_mut()
+            .find_map(|(npc_id, c)| (npc_id.0 == id.0).then_some(c))
     }
 }
 
@@ -209,5 +217,23 @@ mod tests {
 
         let mut world = world;
         assert!(world.entity_mut(unknown).is_none());
+    }
+
+    #[test]
+    fn test_entity_lookup_npc() {
+        // An NPC inserted into `World::npcs` must resolve via `entity()` /
+        // `entity_mut()`. The lookup matches `EntityId.0 == NpcId.0`
+        // (same UUID, different newtype).
+        let mut npc = fresh_pc();
+        let npc_uuid = Uuid::from_u128(0xA1A1A1);
+        npc.id = crate::types::CharacterId(npc_uuid);
+        let mut world = World::new(fresh_pc());
+        world
+            .npcs
+            .insert(crate::types::NpcId(npc_uuid), npc.clone());
+
+        let entity = EntityId(npc_uuid);
+        assert_eq!(world.entity(entity), Some(&npc));
+        assert!(world.entity_mut(entity).is_some());
     }
 }

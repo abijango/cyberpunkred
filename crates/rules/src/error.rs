@@ -6,6 +6,7 @@
 //! pattern-match on the variant; the [`std::fmt::Display`] impl produces
 //! a human-readable message for logs / UI.
 
+use crate::types::EntityId;
 use std::fmt;
 
 /// Failure modes raised by the `cpr_rules` crate.
@@ -25,6 +26,11 @@ pub enum RulesError {
         /// of the request.
         available: u8,
     },
+    /// A resolution referenced an [`EntityId`] that does not resolve to
+    /// any character in the current [`crate::world::World`] — neither the
+    /// PC nor any on-scene NPC. Raised by check / attack resolutions
+    /// when the actor (or defender) cannot be found.
+    EntityNotFound(EntityId),
 }
 
 impl fmt::Display for RulesError {
@@ -37,6 +43,9 @@ impl fmt::Display for RulesError {
                 f,
                 "insufficient LUCK: requested {requested}, available {available}"
             ),
+            RulesError::EntityNotFound(id) => {
+                write!(f, "entity not found in world: {:?}", id.0)
+            }
         }
     }
 }

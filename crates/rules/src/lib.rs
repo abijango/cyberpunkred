@@ -6,6 +6,7 @@
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
 pub mod character;
+pub mod checks;
 pub mod dice;
 pub mod effects;
 pub mod error;
