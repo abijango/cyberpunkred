@@ -9,6 +9,7 @@ pub mod character;
 pub mod dice;
 pub mod effects;
 pub mod error;
+pub mod movement;
 pub mod resolution;
 pub mod rng;
 pub mod types;
