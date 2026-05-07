@@ -18,6 +18,12 @@ pub mod types;
 pub mod world;
 
 pub use catalog::armor::{Armor, ArmorId, ArmorKind, ArmorLocation, ArmorPenalty};
+pub use catalog::lifepath::{
+    BeaconKind, CulturalOriginRow, ExecLifepath, FamilyBackground, FamilyBackgroundRow,
+    FixerLifepath, LawmanLifepath, Lifepath, LifepathTable, MediaLifepath, MedtechLifepath,
+    NetrunnerLifepath, NomadLifepath, RelationshipBeacon, RockerboyLifepath, RoleLifepath,
+    RoleLifepathTables, SoloLifepath, TechLifepath,
+};
 pub use catalog::roles::{RoleAbilityKind, RoleDefinition};
 pub use catalog::skills::{
     Instrument, LanguageKind, LocalArea, MartialArtsForm, ScienceField, SkillCategory,

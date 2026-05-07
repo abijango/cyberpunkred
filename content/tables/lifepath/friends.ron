@@ -1,0 +1,18 @@
+// Your Friends — Friend's Relationship to You (rulebook p.51, top
+// table). Roll 1d10. The number of friends is rolled separately
+// (1d10 - 7, minimum 0); each friend rolls once on this table.
+(
+    die: 10,
+    entries: [
+        (1, "Like an older sibling to you."),
+        (2, "Like a younger sibling to you."),
+        (3, "A teacher or mentor."),
+        (4, "A partner or coworker."),
+        (5, "A former lover."),
+        (6, "An old enemy."),
+        (7, "Like a parent to you."),
+        (8, "An old childhood friend."),
+        (9, "Someone you know from The Street."),
+        (10, "Someone with a common interest or goal."),
+    ],
+)

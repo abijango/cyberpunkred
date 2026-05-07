@@ -1,0 +1,16 @@
+// Clothing Style (rulebook p.47, left column). Roll 1d10.
+(
+    die: 10,
+    entries: [
+        (1, "Generic Chic (Standard, Colorful, Modular)"),
+        (2, "Leisurewear (Comfort, Agility, Athleticism)"),
+        (3, "Urban Flash (Flashy, Technological, Streetwear)"),
+        (4, "Businesswear (Leadership, Presence, Authority)"),
+        (5, "High Fashion (Exclusive, Designer, Couture)"),
+        (6, "Bohemian (Folksy, Retro, Free-spirited)"),
+        (7, "Bag Lady Chic (Homeless, Ragged, Vagrant)"),
+        (8, "Gang Colors (Dangerous, Violent, Rebellious)"),
+        (9, "Nomad Leathers (Western, Rugged, Tribal)"),
+        (10, "Asia Pop (Bright, Costume-like, Youthful)"),
+    ],
+)

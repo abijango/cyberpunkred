@@ -1,0 +1,16 @@
+// Your Personality (rulebook p.46). Roll 1d10.
+(
+    die: 10,
+    entries: [
+        (1, "Shy and secretive"),
+        (2, "Rebellious, antisocial, and violent"),
+        (3, "Arrogant, proud, and aloof"),
+        (4, "Moody, rash, and headstrong"),
+        (5, "Picky, fussy, and nervous"),
+        (6, "Stable and serious"),
+        (7, "Silly and fluff-headed"),
+        (8, "Sneaky and deceptive"),
+        (9, "Intellectual and detached"),
+        (10, "Friendly and outgoing"),
+    ],
+)

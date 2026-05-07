@@ -173,7 +173,8 @@ mod tests {
             money: Eurobucks(1_500),
             improvement_points: 0,
             lifepath: Lifepath {
-                placeholder: "rogue_corporate_runaway".into(),
+                cultural_region: "Sub-Saharan African".into(),
+                ..Lifepath::default()
             },
             effects: stack,
             complementary_bonuses: Vec::new(),

@@ -1,0 +1,52 @@
+// Cultural Origins (rulebook p.45). Roll 1d10.
+//
+// Each row pairs a general cultural region with the languages most
+// commonly spoken there in the Time of the Red. Character creation
+// picks one language and gains 4 ranks of `Language(<that>)`.
+//
+// Schema: LifepathTableFile<CulturalOriginRow> = (die, entries: [(roll, (region, languages))]).
+(
+    die: 10,
+    entries: [
+        (1, (
+            region: "North American",
+            languages: ["Chinese", "Cree", "Creole", "English", "French", "Navajo", "Spanish"],
+        )),
+        (2, (
+            region: "South/Central American",
+            languages: ["Creole", "English", "German", "Guarani", "Mayan", "Portuguese", "Quechua", "Spanish"],
+        )),
+        (3, (
+            region: "Western European",
+            languages: ["Dutch", "English", "French", "German", "Italian", "Norwegian", "Portuguese", "Spanish"],
+        )),
+        (4, (
+            region: "Eastern European",
+            languages: ["English", "Finnish", "Polish", "Romanian", "Russian", "Ukrainian"],
+        )),
+        (5, (
+            region: "Middle Eastern/North African",
+            languages: ["Arabic", "Berber", "English", "Farsi", "French", "Hebrew", "Turkish"],
+        )),
+        (6, (
+            region: "Sub-Saharan African",
+            languages: ["Arabic", "English", "French", "Hausa", "Lingala", "Oromo", "Portuguese", "Swahili", "Twi", "Yoruba"],
+        )),
+        (7, (
+            region: "South Asian",
+            languages: ["Bengali", "Dari", "English", "Hindi", "Nepali", "Sinhalese", "Tamil", "Urdu"],
+        )),
+        (8, (
+            region: "South East Asian",
+            languages: ["Arabic", "Burmese", "English", "Filipino", "Hindi", "Indonesian", "Khmer", "Malayan", "Vietnamese"],
+        )),
+        (9, (
+            region: "East Asian",
+            languages: ["Cantonese Chinese", "English", "Japanese", "Korean", "Mandarin Chinese", "Mongolian"],
+        )),
+        (10, (
+            region: "Oceania/Pacific Islander",
+            languages: ["English", "French", "Hawaiian", "Maori", "Pama-Nyungan", "Tahitian"],
+        )),
+    ],
+)

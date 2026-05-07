@@ -17,6 +17,7 @@ pub mod black_ice;
 pub mod cover;
 pub mod demons;
 pub mod drugs;
+pub mod lifepath;
 pub mod programs;
 pub mod roles;
 pub mod skills;

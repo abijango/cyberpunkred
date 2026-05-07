@@ -1,0 +1,21 @@
+// Your Enemies (rulebook p.51, bottom). Roll 1d10.
+//
+// Each row carries the three columns from p.51 joined into one
+// string with " — " separators: "Enemy — Cause — What can they
+// throw at you?". Character creation can split as desired. The
+// number of enemies is rolled separately (1d10 - 7, minimum 0).
+(
+    die: 10,
+    entries: [
+        (1, "Ex-friend — Caused the other to lose face or status. — Just themselves and even they won't go out of their way."),
+        (2, "Ex-lover — Caused the loss of lover, friend, or relative. — Just themselves."),
+        (3, "Estranged relative — Caused a major public humiliation. — Just themselves and a close friend."),
+        (4, "Childhood enemy — Accused the other of cowardice or some other major personal flaw. — Themselves and a few (1d6/2) friends."),
+        (5, "Person working for you — Deserted or betrayed the other. — Themselves and a few (1d10/2) friends."),
+        (6, "Person you work for — Turned down the other's offer of a job or romantic involvement. — An entire gang (at least 1d10 + 5 people)."),
+        (7, "Partner or coworker — You just don't like each other. — The local cops or other Lawmen."),
+        (8, "Corporate exec — One of you was a romantic rival. — A powerful gang lord or small Corporation."),
+        (9, "Government official — One of you was a business rival. — A powerful Corporation."),
+        (10, "Boostergonger — One of you set the other up for a crime they didn't commit. — An entire city or government or agency."),
+    ],
+)

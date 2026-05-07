@@ -1,0 +1,49 @@
+// Media lifepath (rulebook p.62).
+(
+    tables: [
+        ("media_type", (
+            die: 6,
+            entries: [
+                (1, "Blogger"),
+                (2, "Writer (Books)"),
+                (3, "Videographer"),
+                (4, "Documentarian"),
+                (5, "Investigative Reporter"),
+                (6, "Street Scribe"),
+            ],
+        )),
+        ("how_published", (
+            die: 6,
+            entries: [
+                (1, "Monthly magazine"),
+                (2, "Blog"),
+                (3, "Mainstream vid feed"),
+                (4, "News channel"),
+                (5, "\"Book\" sales"),
+                (6, "Screamsheets"),
+            ],
+        )),
+        ("ethics", (
+            die: 6,
+            entries: [
+                (1, "Fair, honest reporting, strong ethical practices. You only report the verifiable truth."),
+                (2, "Fair and honest reporting, but willing to go on hearsay and rumor if that's what it takes."),
+                (3, "Will occasionally slip and do unethical things, but it's rare. You have some standards."),
+                (4, "Willing to bend any rules to get the bad guys. But only the bad guys."),
+                (5, "Ruthless and determined to make it big, even if it means breaking the law. You're a muckraker."),
+                (6, "Totally corrupt. You take bribes, engage in illegal, unethical reporting all the time. Your pen is for hire to the highest bidder."),
+            ],
+        )),
+        ("story_types", (
+            die: 6,
+            entries: [
+                (1, "Political Intrigue"),
+                (2, "Ecological Impact"),
+                (3, "Celebrity News"),
+                (4, "Corporate Takedowns"),
+                (5, "Editorials"),
+                (6, "Propaganda"),
+            ],
+        )),
+    ],
+)

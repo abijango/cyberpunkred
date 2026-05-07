@@ -1,0 +1,18 @@
+// Your Tragic Love Affair(s) — What Happened? (rulebook p.52). Roll
+// 1d10. The number of tragic love affairs is rolled separately
+// (1d10 - 7, minimum 0); each affair rolls once on this table.
+(
+    die: 10,
+    entries: [
+        (1, "Your lover died in an accident."),
+        (2, "Your lover mysteriously vanished."),
+        (3, "It just didn't work out."),
+        (4, "A personal goal or vendetta came between you and your lover."),
+        (5, "Your lover was kidnapped."),
+        (6, "Your lover went insane or cyberpsycho."),
+        (7, "Your lover committed suicide."),
+        (8, "Your lover was killed in a fight."),
+        (9, "A rival cut you out of the action."),
+        (10, "Your lover is imprisoned or exiled."),
+    ],
+)

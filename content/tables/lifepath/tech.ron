@@ -1,0 +1,75 @@
+// Tech lifepath (rulebook pp.58–59).
+(
+    tables: [
+        ("tech_type", (
+            die: 10,
+            entries: [
+                (1, "Cyberware Technician"),
+                (2, "Vehicle Mechanic"),
+                (3, "Jack of All Trades"),
+                (4, "Small Electronics Technician"),
+                (5, "Weaponsmith"),
+                (6, "Crazy Inventor"),
+                (7, "Robot and Drone Mechanic"),
+                (8, "Heavy Machinery Mechanic"),
+                (9, "Scavenger"),
+                (10, "Nautical Mechanic"),
+            ],
+        )),
+        ("workspace", (
+            die: 6,
+            entries: [
+                (1, "A mess strewn with blueprint paper."),
+                (2, "Everything is color coded, but it's still a nightmare."),
+                (3, "Totally digital and obsessively backed up every day."),
+                (4, "You design everything on your Agent."),
+                (5, "You keep everything just in case you need it later."),
+                (6, "Only you understand your filing system."),
+            ],
+        )),
+        ("partner", (
+            die: 6,
+            entries: [
+                (1, "Family member"),
+                (2, "Old friend"),
+                (3, "Possible romantic partner as well"),
+                (4, "Mentor"),
+                (5, "Secret partner with mob/gang connections"),
+                (6, "Secret partner with Corporate connections"),
+            ],
+        )),
+        ("main_clients", (
+            die: 6,
+            entries: [
+                (1, "Local Fixers who send you clients."),
+                (2, "Local gangers who also protect your work area or home."),
+                (3, "Corporate Execs who use you for \"black project\" work."),
+                (4, "Local Solos or other combat types who use you for weapon upkeep."),
+                (5, "Local Nomads and Fixers who bring you \"found\" tech to repair."),
+                (6, "You work for yourself and sell what you invent/repair."),
+            ],
+        )),
+        ("supply_source", (
+            die: 6,
+            entries: [
+                (1, "Scavenge the wreckage you find in abandoned City Zones."),
+                (2, "Strip gear from bodies after firefights."),
+                (3, "Have a local Fixer bring you supplies in exchange for repair work."),
+                (4, "Corporate Execs supply you with stuff in exchange for your services."),
+                (5, "You have backdoor into a few Corporate warehouses."),
+                (6, "You hit the Night Markets and score deals whenever you can."),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "Combat Zone gangers who want you to work for them exclusively."),
+                (2, "Rival Tech trying to steal your customers."),
+                (3, "Corporates who want you to work for them exclusively."),
+                (4, "Larger manufacturer trying to bring you down because your mods are a threat."),
+                (5, "Old client who thinks you screwed them over."),
+                (6, "Rival Tech trying to beat you out for resources and parts."),
+            ],
+        )),
+    ],
+)

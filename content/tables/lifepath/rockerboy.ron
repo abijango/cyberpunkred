@@ -1,0 +1,65 @@
+// Rockerboy lifepath (rulebook p.54).
+//
+// Sub-tables:
+// - rockerboy_type (1d10): What Kind of Rockerboy are You?
+// - venue (1d6): Where Do You Perform?
+// - whos_gunning (1d6): Who's Gunning for You/Your Group?
+// - why_left (1d6): Why Did You Leave? (only relevant if were-in-group)
+//
+// "Are You in a Group or a Solo Act?" and "Were You Once in a
+// Group?" are choose-only on p.54 — no roll table — so they are not
+// represented here. The character creator records the choice
+// directly in `RockerboyLifepath::group_or_solo` /
+// `were_in_group`.
+(
+    tables: [
+        ("rockerboy_type", (
+            die: 10,
+            entries: [
+                (1, "Musician"),
+                (2, "Slam Poet"),
+                (3, "Street Artist"),
+                (4, "Performance Artist"),
+                (5, "Comedian"),
+                (6, "Orator"),
+                (7, "Politico"),
+                (8, "Rap Artist"),
+                (9, "DJ"),
+                (10, "Idoru"),
+            ],
+        )),
+        ("venue", (
+            die: 6,
+            entries: [
+                (1, "Alternative Cafes"),
+                (2, "Private Clubs"),
+                (3, "Seedy Dive Bars"),
+                (4, "Guerrilla Performances"),
+                (5, "Nightclubs Around the City"),
+                (6, "On the Data Pool"),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "Old group member who thinks you did them dirty."),
+                (2, "Rival group or artist trying to steal market share."),
+                (3, "Corporate enemies who don't like your message."),
+                (4, "Critic or other \"influencer\" trying to bring you down."),
+                (5, "Older media star who feels threatened by your rising fame."),
+                (6, "Romantic interest or media figure who wants revenge for personal reasons."),
+            ],
+        )),
+        ("why_left", (
+            die: 6,
+            entries: [
+                (1, "You were a jerk and the rest of the group voted you out."),
+                (2, "You got caught sleeping around with another member's mainline."),
+                (3, "The rest of the group was killed in a tragic \"accident.\""),
+                (4, "The rest of the group was murdered or otherwise broken up by external enemies."),
+                (5, "The group broke up over \"creative differences.\""),
+                (6, "You decided to go solo."),
+            ],
+        )),
+    ],
+)
