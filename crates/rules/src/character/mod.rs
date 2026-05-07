@@ -12,6 +12,7 @@
 
 pub mod data;
 pub mod derive;
+pub mod hp;
 pub mod luck;
 
 pub use data::{
