@@ -151,7 +151,7 @@ mod tests {
                         quantity: 1,
                     },
                     ItemStack {
-                        kind: ItemKind::Ammo(AmmoKind::Pistol, 30),
+                        kind: ItemKind::Ammo(AmmoKind::MPistol, 30),
                         quantity: 1,
                     },
                     ItemStack {

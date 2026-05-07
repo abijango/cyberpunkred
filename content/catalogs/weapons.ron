@@ -1,0 +1,662 @@
+// Weapon catalog — Cyberpunk RED.
+//
+// Sources:
+//   pp.170–171  ranged weapon table
+//   p.172       Single Shot DVs Based on Range
+//   p.173       Autofire DVs Based on Range
+//   p.174       alt-fire feature flavour (Arrows, Suppressive Fire,
+//               Shotgun Shells, Explosives)
+//   pp.175–176  melee weapon table + resolution rules
+//   pp.340–344  Night Market appendix (same tables, plus brand examples
+//               and the Clip Chart)
+//
+// Schema (see catalog::weapons::Weapon):
+//   slug          string                 // catalog key, also WeaponId.0
+//   id            WeaponId(string)       // newtype, must equal slug
+//   display_name  string
+//   kind          WeaponKind             // Ranged(_) / Melee(_) / Thrown / ExoticRanged / ExoticMelee
+//   skill         SkillId
+//   damage        DamageDice (n, die)
+//   rof           u8                     // 1 or 2
+//   hands         u8                     // 1 or 2
+//   concealable   bool                   // pp.171, 175 "Can be Concealed?"
+//   price         PriceTier              // pp.171, 175 cost column
+//   price_eb      Eurobucks              // canonical_cost of the tier
+//   features      [WeaponFeature]        // alt-fire modes & special features
+//   magazine      Option<Magazine>       // None for melee/thrown/no-magazine exotic
+//   ranges        RangeBand              // empty for melee/thrown
+//
+// Range bands encode (max_meters_inclusive, dv) tuples in ascending range
+// order, exactly as printed in the columns on pp.172–173. A weapon with
+// "N/A" in a band omits that band (the loader treats out-of-range as None).
+//
+// Brand examples on p.342 are *flavour*; this catalog stays at the generic
+// type level — there is no "federated_arms_x9mm" entry, just "medium_pistol".
+WeaponsFile(
+    weapons: [
+        // ====================================================================
+        // RANGED — p.171
+        // ====================================================================
+
+        // -- Medium Pistol — p.171 --
+        (
+            slug: "medium_pistol",
+            id: WeaponId("medium_pistol"),
+            display_name: "Medium Pistol",
+            kind: Ranged(MediumPistol),
+            skill: Handgun,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: Some((capacity: 12, ammo: MPistol)),
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 30)],
+                autofire: None,
+            ),
+        ),
+        // -- Heavy Pistol — p.171 --
+        (
+            slug: "heavy_pistol",
+            id: WeaponId("heavy_pistol"),
+            display_name: "Heavy Pistol",
+            kind: Ranged(HeavyPistol),
+            skill: Handgun,
+            damage: (n: 3, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: Some((capacity: 8, ammo: HPistol)),
+            // Pistol row, p.172.
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 30)],
+                autofire: None,
+            ),
+        ),
+        // -- Very Heavy Pistol — p.171 --
+        (
+            slug: "very_heavy_pistol",
+            id: WeaponId("very_heavy_pistol"),
+            display_name: "Very Heavy Pistol",
+            kind: Ranged(VeryHeavyPistol),
+            skill: Handgun,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: Some((capacity: 8, ammo: VHPistol)),
+            // Pistol row, p.172.
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 30)],
+                autofire: None,
+            ),
+        ),
+        // -- SMG — p.171 (Autofire(3), Suppressive Fire) --
+        (
+            slug: "smg",
+            id: WeaponId("smg"),
+            display_name: "SMG",
+            kind: Ranged(SMG),
+            skill: Handgun,
+            damage: (n: 2, die: D6),
+            rof: 1,
+            hands: 1,
+            concealable: true,
+            price: Premium,
+            price_eb: (100),
+            features: [Autofire(3), SuppressiveFire],
+            magazine: Some((capacity: 30, ammo: MPistol)),
+            // SMG row, p.172, plus SMG autofire row, p.173.
+            ranges: (
+                single_shot: [(6, 15), (12, 13), (25, 15), (50, 20), (100, 25), (200, 25), (400, 30)],
+                autofire: Some([(6, 20), (12, 17), (25, 20), (50, 25), (100, 30)]),
+            ),
+        ),
+        // -- Heavy SMG — p.171 (Autofire(3), Suppressive Fire) --
+        // Per p.171 the Heavy SMG fires Heavy Pistol rounds (the H Pistol
+        // ammunition entry in the Standard Magazine column). p.172 doesn't
+        // print a separate Heavy SMG row, so it inherits the Pistol row
+        // for single-shot range bands. The SMG autofire row covers it on
+        // p.173 (the column header is "SMGs", plural).
+        (
+            slug: "heavy_smg",
+            id: WeaponId("heavy_smg"),
+            display_name: "Heavy SMG",
+            kind: Ranged(HeavySMG),
+            skill: Handgun,
+            damage: (n: 3, die: D6),
+            rof: 1,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [Autofire(3), SuppressiveFire],
+            magazine: Some((capacity: 40, ammo: HPistol)),
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 30)],
+                autofire: Some([(6, 20), (12, 17), (25, 20), (50, 25), (100, 30)]),
+            ),
+        ),
+        // -- Shotgun — p.171 (Shotgun Shell alt-fire) --
+        (
+            slug: "shotgun",
+            id: WeaponId("shotgun"),
+            display_name: "Shotgun",
+            kind: Ranged(Shotgun),
+            skill: ShoulderArms,
+            damage: (n: 5, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [ShotgunShell],
+            magazine: Some((capacity: 4, ammo: Slug)),
+            // Shotgun (Slug) row, p.172.
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 35)],
+                autofire: None,
+            ),
+        ),
+        // -- Assault Rifle — p.171 (Autofire(4), Suppressive Fire) --
+        (
+            slug: "assault_rifle",
+            id: WeaponId("assault_rifle"),
+            display_name: "Assault Rifle",
+            kind: Ranged(AssaultRifle),
+            skill: ShoulderArms,
+            damage: (n: 5, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [Autofire(4), SuppressiveFire],
+            magazine: Some((capacity: 25, ammo: Rifle)),
+            // Assault Rifle row, p.172, plus Assault Rifle autofire row, p.173.
+            ranges: (
+                single_shot: [(6, 17), (12, 16), (25, 15), (50, 13), (100, 15), (200, 20), (400, 25), (800, 30)],
+                autofire: Some([(6, 22), (12, 20), (25, 17), (50, 20), (100, 25)]),
+            ),
+        ),
+        // -- Sniper Rifle — p.171 --
+        // Note the inverted curve on p.172: short range is *harder*.
+        (
+            slug: "sniper_rifle",
+            id: WeaponId("sniper_rifle"),
+            display_name: "Sniper Rifle",
+            kind: Ranged(SniperRifle),
+            skill: ShoulderArms,
+            damage: (n: 5, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: Some((capacity: 4, ammo: Rifle)),
+            // Sniper Rifle row, p.172.
+            ranges: (
+                single_shot: [(6, 30), (12, 25), (25, 25), (50, 20), (100, 15), (200, 16), (400, 17), (800, 20)],
+                autofire: None,
+            ),
+        ),
+        // -- Bows & Crossbows — p.171 (Arrows feature) --
+        // p.171 prints "N/A (Arrow)" in the Standard Magazine column —
+        // because (per p.174) basic arrows can always be retrieved, so
+        // bows never need to Reload. We encode this as a magazine of
+        // capacity 0 with ammo Arrow plus the Arrows feature, and add
+        // SilentNotSilenced from the same flavour box.
+        (
+            slug: "bow_crossbow",
+            id: WeaponId("bow_crossbow"),
+            display_name: "Bows & Crossbows",
+            kind: Ranged(BowCrossbow),
+            skill: Archery,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [Arrows, SilentNotSilenced],
+            magazine: Some((capacity: 0, ammo: Arrow)),
+            // Bows & Crossbow row, p.172.
+            ranges: (
+                single_shot: [(6, 15), (12, 13), (25, 15), (50, 17), (100, 20), (200, 22)],
+                autofire: None,
+            ),
+        ),
+        // -- Grenade Launcher — p.171 (Explosive) --
+        (
+            slug: "grenade_launcher",
+            id: WeaponId("grenade_launcher"),
+            display_name: "Grenade Launcher",
+            kind: Ranged(GrenadeLauncher),
+            skill: HeavyWeapons,
+            damage: (n: 6, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [Explosive],
+            magazine: Some((capacity: 2, ammo: Grenade)),
+            // Grenade Launcher row, p.172.
+            ranges: (
+                single_shot: [(6, 16), (12, 15), (25, 15), (50, 17), (100, 20), (200, 22), (400, 25)],
+                autofire: None,
+            ),
+        ),
+        // -- Rocket Launcher — p.171 (Explosive) --
+        (
+            slug: "rocket_launcher",
+            id: WeaponId("rocket_launcher"),
+            display_name: "Rocket Launcher",
+            kind: Ranged(RocketLauncher),
+            skill: HeavyWeapons,
+            damage: (n: 8, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [Explosive],
+            magazine: Some((capacity: 1, ammo: Rocket)),
+            // Rocket Launcher row, p.172.
+            ranges: (
+                single_shot: [(6, 17), (12, 16), (25, 15), (50, 15), (100, 20), (200, 20), (400, 25), (800, 30)],
+                autofire: None,
+            ),
+        ),
+
+        // ====================================================================
+        // MELEE — p.175
+        //
+        // The book lists four classifications (Light / Medium / Heavy /
+        // Very Heavy) with example weapons inside each row. We catalogue
+        // the four classifications themselves *and* the named example
+        // weapons so combat tests / character fixtures can pin a specific
+        // weapon (a "machete" has the same dice as the generic
+        // "medium_melee_weapon", but having a slug for it is more
+        // legible). Damage / ROF / hands / cost are identical within a
+        // classification per p.175.
+        // ====================================================================
+
+        // -- Light Melee Weapon (generic) — p.175 --
+        (
+            slug: "light_melee_weapon",
+            id: WeaponId("light_melee_weapon"),
+            display_name: "Light Melee Weapon",
+            kind: Melee(Light),
+            skill: MeleeWeapon,
+            damage: (n: 1, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Combat Knife — example light melee, p.175.
+        (
+            slug: "combat_knife",
+            id: WeaponId("combat_knife"),
+            display_name: "Combat Knife",
+            kind: Melee(Light),
+            skill: MeleeWeapon,
+            damage: (n: 1, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Tomahawk — example light melee, p.175.
+        (
+            slug: "tomahawk",
+            id: WeaponId("tomahawk"),
+            display_name: "Tomahawk",
+            kind: Melee(Light),
+            skill: MeleeWeapon,
+            damage: (n: 1, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // -- Medium Melee Weapon (generic) — p.175 --
+        (
+            slug: "medium_melee_weapon",
+            id: WeaponId("medium_melee_weapon"),
+            display_name: "Medium Melee Weapon",
+            kind: Melee(Medium),
+            skill: MeleeWeapon,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Baseball Bat — example medium melee, p.175.
+        (
+            slug: "baseball_bat",
+            id: WeaponId("baseball_bat"),
+            display_name: "Baseball Bat",
+            kind: Melee(Medium),
+            skill: MeleeWeapon,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Crowbar — example medium melee, p.175.
+        (
+            slug: "crowbar",
+            id: WeaponId("crowbar"),
+            display_name: "Crowbar",
+            kind: Melee(Medium),
+            skill: MeleeWeapon,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Machete — example medium melee, p.175.
+        (
+            slug: "machete",
+            id: WeaponId("machete"),
+            display_name: "Machete",
+            kind: Melee(Medium),
+            skill: MeleeWeapon,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // -- Heavy Melee Weapon (generic) — p.175 --
+        (
+            slug: "heavy_melee_weapon",
+            id: WeaponId("heavy_melee_weapon"),
+            display_name: "Heavy Melee Weapon",
+            kind: Melee(Heavy),
+            skill: MeleeWeapon,
+            damage: (n: 3, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Lead Pipe — example heavy melee, p.175.
+        (
+            slug: "lead_pipe",
+            id: WeaponId("lead_pipe"),
+            display_name: "Lead Pipe",
+            kind: Melee(Heavy),
+            skill: MeleeWeapon,
+            damage: (n: 3, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Sword — example heavy melee, p.175.
+        (
+            slug: "sword",
+            id: WeaponId("sword"),
+            display_name: "Sword",
+            kind: Melee(Heavy),
+            skill: MeleeWeapon,
+            damage: (n: 3, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Spiked Bat — example heavy melee, p.175.
+        (
+            slug: "spiked_bat",
+            id: WeaponId("spiked_bat"),
+            display_name: "Spiked Bat",
+            kind: Melee(Heavy),
+            skill: MeleeWeapon,
+            damage: (n: 3, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // -- Very Heavy Melee Weapon (generic) — p.175 (ROF 1) --
+        (
+            slug: "very_heavy_melee_weapon",
+            id: WeaponId("very_heavy_melee_weapon"),
+            display_name: "Very Heavy Melee Weapon",
+            kind: Melee(VeryHeavy),
+            skill: MeleeWeapon,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Chainsaw — example very heavy melee, p.175.
+        (
+            slug: "chainsaw",
+            id: WeaponId("chainsaw"),
+            display_name: "Chainsaw",
+            kind: Melee(VeryHeavy),
+            skill: MeleeWeapon,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Sledgehammer — example very heavy melee, p.175.
+        (
+            slug: "sledgehammer",
+            id: WeaponId("sledgehammer"),
+            display_name: "Sledgehammer",
+            kind: Melee(VeryHeavy),
+            skill: MeleeWeapon,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Helicopter Blades — example very heavy melee, p.175.
+        // (Yes, the rulebook really says "Helicopter Blades" — exotic
+        // imagery but mechanically a Very Heavy Melee Weapon.)
+        (
+            slug: "helicopter_blades",
+            id: WeaponId("helicopter_blades"),
+            display_name: "Helicopter Blades",
+            kind: Melee(VeryHeavy),
+            skill: MeleeWeapon,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+        // Naginata — example very heavy melee, p.175.
+        (
+            slug: "naginata",
+            id: WeaponId("naginata"),
+            display_name: "Naginata",
+            kind: Melee(VeryHeavy),
+            skill: MeleeWeapon,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: None,
+            ranges: (single_shot: [], autofire: None),
+        ),
+
+        // ====================================================================
+        // BRAND-NAMED RANGED WEAPONS — p.342 (Ranged Weapon Brand Examples)
+        //
+        // These have identical mechanical stats to their generic
+        // counterpart (Excellent/Poor quality only changes Cost and adds
+        // a +1 Attack Check, per p.342 — the engine layer applies that
+        // bonus when an "Excellent" weapon is wielded). We catalog a
+        // handful of named brand examples so character fixtures and
+        // narrative content can pin a specific weapon name.
+        // ====================================================================
+
+        // Federated Arms X-9mm — Standard Medium Pistol, p.342.
+        (
+            slug: "federated_arms_x9mm",
+            id: WeaponId("federated_arms_x9mm"),
+            display_name: "Federated Arms X-9mm",
+            kind: Ranged(MediumPistol),
+            skill: Handgun,
+            damage: (n: 2, die: D6),
+            rof: 2,
+            hands: 1,
+            concealable: true,
+            price: Costly,
+            price_eb: (50),
+            features: [],
+            magazine: Some((capacity: 12, ammo: MPistol)),
+            ranges: (
+                single_shot: [(6, 13), (12, 15), (25, 20), (50, 25), (100, 30), (200, 30)],
+                autofire: None,
+            ),
+        ),
+        // Militech "Ronin" — Standard Assault Rifle, p.342.
+        (
+            slug: "militech_ronin",
+            id: WeaponId("militech_ronin"),
+            display_name: "Militech \"Ronin\"",
+            kind: Ranged(AssaultRifle),
+            skill: ShoulderArms,
+            damage: (n: 5, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [Autofire(4), SuppressiveFire],
+            magazine: Some((capacity: 25, ammo: Rifle)),
+            ranges: (
+                single_shot: [(6, 17), (12, 16), (25, 15), (50, 13), (100, 15), (200, 20), (400, 25), (800, 30)],
+                autofire: Some([(6, 22), (12, 20), (25, 17), (50, 20), (100, 25)]),
+            ),
+        ),
+        // Nomad "Long Rifle" — Standard Sniper Rifle, p.342.
+        (
+            slug: "nomad_long_rifle",
+            id: WeaponId("nomad_long_rifle"),
+            display_name: "Nomad \"Long Rifle\"",
+            kind: Ranged(SniperRifle),
+            skill: ShoulderArms,
+            damage: (n: 5, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Expensive,
+            price_eb: (500),
+            features: [],
+            magazine: Some((capacity: 4, ammo: Rifle)),
+            ranges: (
+                single_shot: [(6, 30), (12, 25), (25, 25), (50, 20), (100, 15), (200, 16), (400, 17), (800, 20)],
+                autofire: None,
+            ),
+        ),
+        // Eagletech "Tomcat" — Standard Bow, p.342.
+        (
+            slug: "eagletech_tomcat",
+            id: WeaponId("eagletech_tomcat"),
+            display_name: "Eagletech \"Tomcat\"",
+            kind: Ranged(BowCrossbow),
+            skill: Archery,
+            damage: (n: 4, die: D6),
+            rof: 1,
+            hands: 2,
+            concealable: false,
+            price: Premium,
+            price_eb: (100),
+            features: [Arrows, SilentNotSilenced],
+            magazine: Some((capacity: 0, ammo: Arrow)),
+            ranges: (
+                single_shot: [(6, 15), (12, 13), (25, 15), (50, 17), (100, 20), (200, 22)],
+                autofire: None,
+            ),
+        ),
+    ],
+)

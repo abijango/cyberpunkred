@@ -20,6 +20,7 @@ pub mod drugs;
 pub mod programs;
 pub mod skills;
 pub mod vehicles;
+pub mod weapons;
 
 /// A read-only collection of catalog entries keyed by string slug.
 ///
