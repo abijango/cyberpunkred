@@ -179,16 +179,14 @@ pub enum EffectDuration {
 
 /// Kind of critical injury.
 ///
-/// **Stub.** WP-205 will replace this with a closed enum of 24 variants
-/// drawn from the Critical Injuries to the Body table (p.187) and
-/// Critical Injuries to the Head table (p.188).
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum CriticalInjuryKind {
-    /// Until WP-205 lands the real variants. Carries the injury name as a
-    /// free-form string so test fixtures and pre-WP-205 callers can construct
-    /// concrete values.
-    Placeholder(String),
-}
+/// The closed enum lives in [`crate::catalog::critical_injuries`]
+/// (WP-205); it is re-exported here so legacy call sites that referenced
+/// `effects::CriticalInjuryKind` and the `EffectSource::CriticalInjury(_)`
+/// constructor continue to compile unchanged. See pp.187–188 for the
+/// canonical list of 21 variants (one variant per distinct injury named
+/// on the Body and Head tables; "Foreign Object" appears on both tables
+/// and shares a single variant).
+pub use crate::catalog::critical_injuries::CriticalInjuryKind;
 
 /// Wound State per book p.186.
 ///

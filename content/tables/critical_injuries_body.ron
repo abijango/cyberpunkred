@@ -1,0 +1,218 @@
+// Critical Injuries to the Body — Cyberpunk RED rulebook p.187.
+//
+// Each entry is one row of the 12-row 2d6 table. The loader
+// (cpr_rules::catalog::critical_injuries::load_critical_injuries_body)
+// validates that every roll 2..=12 is present exactly once, that every
+// row's `kind` and `table` match this table, and that bonus_damage is
+// always HpDamage(5) per the box text on p.187.
+//
+// Schema: every entry has
+//   slug: string           // catalog lookup key, "crit_body_<roll>"
+//   kind: CriticalInjuryKind
+//   table: Body
+//   d2d6_roll: 2..=12
+//   display_name: string
+//   effects: [EffectModifier]   // closed-enum modifiers (WP-003)
+//   bonus_damage: (5)           // HpDamage newtype, always 5 per p.187
+//   quick_fix: Option<QuickFix> // None for "N/A" rows
+//   treatment: Treatment
+//   increases_death_save_penalty: bool
+CriticalInjuriesFile(
+    table: Body,
+    entries: [
+        // 2 — Dismembered Arm. Drops items, +1 Death Save Penalty. p.187.
+        (
+            slug: "crit_body_02",
+            kind: DismemberedArm,
+            table: Body,
+            d2d6_roll: 2,
+            display_name: "Dismembered Arm",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+        // 3 — Dismembered Hand. Drops items, +1 Death Save Penalty. p.187.
+        (
+            slug: "crit_body_03",
+            kind: DismemberedHand,
+            table: Body,
+            d2d6_roll: 3,
+            display_name: "Dismembered Hand",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+        // 4 — Collapsed Lung. -2 to MOVE (min 1), +1 DSP. p.187.
+        (
+            slug: "crit_body_04",
+            kind: CollapsedLung,
+            table: Body,
+            d2d6_roll: 4,
+            display_name: "Collapsed Lung",
+            effects: [
+                MovePenalty(-2),
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (15))),
+            treatment: (method: Surgery, dv: (15)),
+            increases_death_save_penalty: true,
+        ),
+        // 5 — Broken Ribs. End-of-Turn re-suffer 5 HP if moved >4m on
+        // foot. p.187.
+        (
+            slug: "crit_body_05",
+            kind: BrokenRibs,
+            table: Body,
+            d2d6_roll: 5,
+            display_name: "Broken Ribs",
+            effects: [
+                DamageOnMovementOver(threshold_m: 4, damage: (5)),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            // Treatment column lists "Paramedic DV15 or Surgery DV13" —
+            // store the lower-DV / lower-tier path (Surgery DV13). The
+            // engine treats the alternative as a campaign-flavour
+            // choice the LLM/UI may surface.
+            treatment: (method: Surgery, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 6 — Broken Arm. Cannot use that arm; drop items. p.187.
+        // The closed `EffectModifier` enum (WP-003) has no dedicated
+        // "cannot use this hand" variant; we model the prohibition with
+        // the most-negative `HandActionsPenalty` the i8 field admits
+        // (-100 → any d10+stat+skill check loses to any DV ladder
+        // value). Treat this as a faithful encoding of "cannot be used"
+        // until / unless a future WP introduces a `CannotUseHand`
+        // variant. Documented as a deviation in the WP-205 PR.
+        (
+            slug: "crit_body_06",
+            kind: BrokenArm,
+            table: Body,
+            d2d6_roll: 6,
+            display_name: "Broken Arm",
+            effects: [
+                HandActionsPenalty(hand: Either, by: -100),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            // "Paramedic DV15 or Surgery DV13" — pick Surgery DV13.
+            treatment: (method: Surgery, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 7 — Foreign Object. End-of-Turn re-suffer 5 HP on >4m move.
+        // Quick Fix removes the Injury Effect permanently. p.187.
+        (
+            slug: "crit_body_07",
+            kind: ForeignObject,
+            table: Body,
+            d2d6_roll: 7,
+            display_name: "Foreign Object",
+            effects: [
+                DamageOnMovementOver(threshold_m: 4, damage: (5)),
+            ],
+            bonus_damage: (5),
+            // First Aid OR Paramedic at DV13. Store First Aid (lower-tier
+            // skill that satisfies the row).
+            quick_fix: Some((method: FirstAid, dv: (13))),
+            // "Quick Fix removes Injury Effect permanently" — there is no
+            // separate long-term Treatment column; record the same DV13
+            // path for completeness. The narrator/combat engine treats
+            // the Quick-Fix-permanent rule via the row's kind.
+            treatment: (method: FirstAid, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 8 — Broken Leg. -4 to MOVE (min 1). p.187.
+        (
+            slug: "crit_body_08",
+            kind: BrokenLeg,
+            table: Body,
+            d2d6_roll: 8,
+            display_name: "Broken Leg",
+            effects: [
+                MovePenalty(-4),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            // "Paramedic DV15 or Surgery DV13".
+            treatment: (method: Surgery, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 9 — Torn Muscle. -2 to Melee Attacks. Quick Fix removes
+        // permanently. p.187.
+        (
+            slug: "crit_body_09",
+            kind: TornMuscle,
+            table: Body,
+            d2d6_roll: 9,
+            display_name: "Torn Muscle",
+            effects: [
+                MeleeAttackPenalty(-2),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: FirstAid, dv: (13))),
+            treatment: (method: FirstAid, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 10 — Spinal Injury. Cannot take Action next turn (still can
+        // take Move). +1 DSP. p.187.
+        (
+            slug: "crit_body_10",
+            kind: SpinalInjury,
+            table: Body,
+            d2d6_roll: 10,
+            display_name: "Spinal Injury",
+            effects: [
+                CannotTakeAction,
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (15))),
+            treatment: (method: Surgery, dv: (15)),
+            increases_death_save_penalty: true,
+        ),
+        // 11 — Crushed Fingers. -4 to all Actions involving that hand.
+        // p.187.
+        (
+            slug: "crit_body_11",
+            kind: CrushedFingers,
+            table: Body,
+            d2d6_roll: 11,
+            display_name: "Crushed Fingers",
+            effects: [
+                HandActionsPenalty(hand: Either, by: -4),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            treatment: (method: Surgery, dv: (15)),
+            increases_death_save_penalty: false,
+        ),
+        // 12 — Dismembered Leg. -6 to MOVE (min 1), cannot dodge, +1 DSP.
+        // p.187.
+        (
+            slug: "crit_body_12",
+            kind: DismemberedLeg,
+            table: Body,
+            d2d6_roll: 12,
+            display_name: "Dismembered Leg",
+            effects: [
+                MovePenalty(-6),
+                CannotDodge,
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+    ],
+)

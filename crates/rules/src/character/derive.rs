@@ -414,9 +414,7 @@ mod tests {
         push_effect(
             &mut pc,
             2,
-            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::Placeholder(
-                "crushed_fingers".into(),
-            )),
+            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::CrushedFingers),
             vec![EffectModifier::HandActionsPenalty {
                 hand: Hand::Either,
                 by: -2,
@@ -454,9 +452,7 @@ mod tests {
         push_effect(
             &mut pc,
             1,
-            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::Placeholder(
-                "spinal_injury".into(),
-            )),
+            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::SpinalInjury),
             vec![EffectModifier::CannotTakeAction],
         );
         assert!(pc.cannot_take_action());
@@ -475,9 +471,7 @@ mod tests {
         push_effect(
             &mut pc,
             1,
-            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::Placeholder(
-                "dismembered_leg".into(),
-            )),
+            EffectSource::CriticalInjury(crate::effects::CriticalInjuryKind::DismemberedLeg),
             vec![
                 EffectModifier::CannotTakeMoveAction,
                 EffectModifier::CannotDodge,

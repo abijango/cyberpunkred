@@ -18,6 +18,9 @@ pub mod types;
 pub mod world;
 
 pub use catalog::armor::{Armor, ArmorId, ArmorKind, ArmorLocation, ArmorPenalty};
+pub use catalog::critical_injuries::{
+    CritTable, CriticalInjury, CriticalInjuryKind, HealMethod, QuickFix, Treatment,
+};
 pub use catalog::lifepath::{
     BeaconKind, CulturalOriginRow, ExecLifepath, FamilyBackground, FamilyBackgroundRow,
     FixerLifepath, LawmanLifepath, Lifepath, LifepathTable, MediaLifepath, MedtechLifepath,

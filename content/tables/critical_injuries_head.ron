@@ -1,0 +1,213 @@
+// Critical Injuries to the Head — Cyberpunk RED rulebook p.188.
+//
+// Each entry is one row of the 12-row 2d6 table for Aimed-Shot-to-the-head
+// damage spikes. The loader
+// (cpr_rules::catalog::critical_injuries::load_critical_injuries_head)
+// validates that every roll 2..=12 is present exactly once, that every
+// row's `kind` and `table` match this table, and that bonus_damage is
+// always HpDamage(5) per the box text on p.187.
+//
+// Schema: every entry has
+//   slug: string           // catalog lookup key, "crit_head_<roll>"
+//   kind: CriticalInjuryKind
+//   table: Head
+//   d2d6_roll: 2..=12
+//   display_name: string
+//   effects: [EffectModifier]   // closed-enum modifiers (WP-003)
+//   bonus_damage: (5)           // HpDamage newtype, always 5 per p.187
+//   quick_fix: Option<QuickFix> // None for "N/A" rows
+//   treatment: Treatment
+//   increases_death_save_penalty: bool
+//
+// Note on Cracked Skull (row 9): the rulebook text "Aimed Shots to your
+// head multiply the damage that gets through your SP by 3 instead of 2"
+// has no dedicated `EffectModifier` variant in WP-003. The combat engine
+// (WP-305+) reads the `kind == CrackedSkull` flag directly when computing
+// head-shot damage. Only the +1 Death-Save-Penalty bump is encoded as a
+// modifier here. Documented as a deviation in the WP-205 PR.
+CriticalInjuriesFile(
+    table: Head,
+    entries: [
+        // 2 — Lost Eye. -4 to Ranged & vision Perception. +1 DSP. p.188.
+        // The current EffectModifier enum lacks a vision-specific
+        // Perception penalty; the -4 to Ranged Attacks is encoded as a
+        // global -4 to Ranged-skill checks via the closest modifier we
+        // have (no Ranged-action-only variant exists either). For now
+        // we record only the +1 DSP and the kind itself; the combat
+        // engine reads `kind == LostEye` for the targeted application.
+        // Documented in the WP-205 PR.
+        (
+            slug: "crit_head_02",
+            kind: LostEye,
+            table: Head,
+            d2d6_roll: 2,
+            display_name: "Lost Eye",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+        // 3 — Brain Injury. -2 to all Actions. +1 DSP. p.188.
+        (
+            slug: "crit_head_03",
+            kind: BrainInjury,
+            table: Head,
+            d2d6_roll: 3,
+            display_name: "Brain Injury",
+            effects: [
+                AllActionsPenalty(-2),
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+        // 4 — Damaged Eye. -2 to Ranged & vision Perception. p.188.
+        // (Same Perception-vs-vision encoding caveat as Lost Eye.)
+        (
+            slug: "crit_head_04",
+            kind: DamagedEye,
+            table: Head,
+            d2d6_roll: 4,
+            display_name: "Damaged Eye",
+            effects: [],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (15))),
+            treatment: (method: Surgery, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 5 — Concussion. -2 to all Actions. Quick Fix removes the
+        // Injury Effect permanently. p.188.
+        (
+            slug: "crit_head_05",
+            kind: Concussion,
+            table: Head,
+            d2d6_roll: 5,
+            display_name: "Concussion",
+            effects: [
+                AllActionsPenalty(-2),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: FirstAid, dv: (13))),
+            treatment: (method: FirstAid, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 6 — Broken Jaw. -4 to all Actions involving speech. p.188.
+        // The current EffectModifier has no "speech-only" penalty; the
+        // narrator/UI reads `kind == BrokenJaw` for targeted gating.
+        (
+            slug: "crit_head_06",
+            kind: BrokenJaw,
+            table: Head,
+            d2d6_roll: 6,
+            display_name: "Broken Jaw",
+            effects: [],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            treatment: (method: Paramedic, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 7 — Foreign Object. End-of-Turn re-suffer 5 HP on >4m move.
+        // Quick Fix removes Injury Effect permanently. p.188.
+        (
+            slug: "crit_head_07",
+            kind: ForeignObject,
+            table: Head,
+            d2d6_roll: 7,
+            display_name: "Foreign Object",
+            effects: [
+                DamageOnMovementOver(threshold_m: 4, damage: (5)),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: FirstAid, dv: (13))),
+            treatment: (method: FirstAid, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 8 — Whiplash. +1 DSP only (no penalty rider). p.188.
+        (
+            slug: "crit_head_08",
+            kind: Whiplash,
+            table: Head,
+            d2d6_roll: 8,
+            display_name: "Whiplash",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            treatment: (method: Paramedic, dv: (13)),
+            increases_death_save_penalty: true,
+        ),
+        // 9 — Cracked Skull. Aimed-Shot-to-head damage ×3 (instead of
+        // ×2). +1 DSP. p.188. The ×3 multiplier has no EffectModifier
+        // variant; combat engine reads kind directly. See file
+        // header note.
+        (
+            slug: "crit_head_09",
+            kind: CrackedSkull,
+            table: Head,
+            d2d6_roll: 9,
+            display_name: "Cracked Skull",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (15))),
+            treatment: (method: Paramedic, dv: (15)),
+            increases_death_save_penalty: true,
+        ),
+        // 10 — Damaged Ear. Move >4m on foot → no Move Action next
+        // turn. -2 to Perception involving hearing. p.188. The
+        // closed enum has no "no-move-after-move" variant; we encode
+        // the move-trigger as DamageOnMovementOver with damage 0
+        // would mislead, so we leave the trigger to the combat engine
+        // reading `kind == DamagedEar`. Documented in PR.
+        (
+            slug: "crit_head_10",
+            kind: DamagedEar,
+            table: Head,
+            d2d6_roll: 10,
+            display_name: "Damaged Ear",
+            effects: [],
+            bonus_damage: (5),
+            quick_fix: Some((method: Paramedic, dv: (13))),
+            treatment: (method: Surgery, dv: (13)),
+            increases_death_save_penalty: false,
+        ),
+        // 11 — Crushed Windpipe. Cannot speak. +1 DSP. p.188.
+        (
+            slug: "crit_head_11",
+            kind: CrushedWindpipe,
+            table: Head,
+            d2d6_roll: 11,
+            display_name: "Crushed Windpipe",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (15)),
+            increases_death_save_penalty: true,
+        ),
+        // 12 — Lost Ear. Move >4m → no Move next turn. -4 to hearing
+        // Perception. +1 DSP. p.188.
+        (
+            slug: "crit_head_12",
+            kind: LostEar,
+            table: Head,
+            d2d6_roll: 12,
+            display_name: "Lost Ear",
+            effects: [
+                DeathSavePenaltyDelta(1),
+            ],
+            bonus_damage: (5),
+            quick_fix: None,
+            treatment: (method: Surgery, dv: (17)),
+            increases_death_save_penalty: true,
+        ),
+    ],
+)
