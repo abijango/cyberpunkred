@@ -155,7 +155,7 @@ impl CombatState {
             round: 1,
             queue,
             turn_index: 0,
-            grid: Grid,
+            grid: Grid::default(),
             participants: participant_set,
         }
     }
