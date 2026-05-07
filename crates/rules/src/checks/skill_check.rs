@@ -186,26 +186,33 @@ fn roll_one_check(
     //    no-op on the failing path, so the actor's pool is preserved.
     actor.spend_luck(p.luck_to_spend)?;
 
-    // 3. Snapshot the values we need from the actor. current_stat /
+    // 3. Consume any pending Complementary Skill bonus for this skill
+    //    (rulebook p.130). The bonus is one-shot: taking it removes
+    //    it from the actor. Done *after* LUCK validation so a failed
+    //    LUCK spend never consumes the bonus.
+    let complementary = actor.take_complementary_bonus(p.skill);
+
+    // 4. Snapshot the values we need from the actor. current_stat /
     //    current_skill / all_actions_penalty are `&self` queries; the
     //    `&mut Character` we hold can call them without trouble.
     let stat_value = actor.current_stat(p.stat);
     let skill_value = actor.current_skill(p.skill);
     let aap = i16::from(actor.all_actions_penalty());
 
-    // 4. Sum GM/Beat modifiers. These are signed; rulebook ranges
+    // 5. Sum GM/Beat modifiers. These are signed; rulebook ranges
     //    typically fit in i8, but we widen to i16 to match
     //    CheckBreakdown::new's input shape and avoid overflow in
     //    pathological multi-modifier stacks.
     let extra: i16 = p.additional.iter().map(|m| i16::from(m.value)).sum();
-    let modifier_total = aap + extra;
+    let complementary_bonus: i16 = if complementary.is_some() { 1 } else { 0 };
+    let modifier_total = aap + extra + complementary_bonus;
 
-    // 5. Roll the d10 (with crit handling). After this point the RNG
+    // 6. Roll the d10 (with crit handling). After this point the RNG
     //    has advanced; an early-return error path would have advanced
     //    nothing.
     let d10 = d10_with_crits(rng);
 
-    // 6. Build the breakdown — final_value/margin/success are derived.
+    // 7. Build the breakdown — final_value/margin/success are derived.
     Ok(CheckBreakdown::new(
         stat_value,
         skill_value,

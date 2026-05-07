@@ -173,6 +173,7 @@ pub(crate) mod test_support {
             improvement_points: 0,
             lifepath: Lifepath::default(),
             effects: EffectStack::new(),
+            complementary_bonuses: Vec::new(),
         }
     }
 }
