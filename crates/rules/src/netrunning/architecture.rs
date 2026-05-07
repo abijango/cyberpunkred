@@ -197,6 +197,19 @@ pub enum Floor {
         template: BlackIceId,
         /// Whether the ICE is lying in wait, engaged, slid, or destroyed.
         state: BlackIceState,
+        /// The ICE's Perception (PER) stat, cached from the catalog row.
+        ///
+        /// Stored inline so that Interface Ability resolvers (e.g. Slide,
+        /// WP-410) can access the PER stat for the contested roll without
+        /// requiring a live `Catalog<BlackIce>` lookup at resolve time.
+        /// Mirrors the `per` column on pp.206–207. Default value of `0`
+        /// keeps older `Floor::BlackIce` constructions valid via
+        /// `#[serde(default)]`.
+        ///
+        /// See p.200 (Slide: "Program's Perception + 1d10") and p.206 (PER
+        /// column definition).
+        #[serde(default)]
+        ice_per: u8,
     },
 
     /// A Demon floor. A Demon can control multiple Control Nodes concurrently.
@@ -499,6 +512,9 @@ fn pick_floor(
         Floor::BlackIce {
             template: pick_black_ice(rng),
             state: BlackIceState::LyingInWait,
+            // `ice_per` defaults to 0; the catalog-wiring WP (WP-404+) will
+            // populate this from the live Catalog<BlackIce>. See p.206 (PER).
+            ice_per: 0,
         }
     }
 }
@@ -888,6 +904,7 @@ mod tests {
             Floor::BlackIce {
                 template: BlackIceId("hellhound".into()),
                 state: BlackIceState::LyingInWait,
+                ice_per: 6,
             },
             Floor::Demon {
                 template: DemonId("imp".into()),
