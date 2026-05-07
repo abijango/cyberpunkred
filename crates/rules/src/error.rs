@@ -41,12 +41,19 @@ pub enum RulesError {
     /// A NET Action was attempted but the Netrunner has already exhausted
     /// their NET Action budget for this turn.
     ///
-    /// The number of NET Actions per turn is determined by Interface rank
-    /// (p.197). `net_actions_used_this_turn >= net_actions_max_this_turn`
-    /// triggers this error; state is left unchanged.
-    ///
     /// See p.197 (NET Actions table).
     NoNetActionsRemaining,
+    /// A NET Action requires a specific floor type but the current floor is
+    /// a different type. For example, Backdoor (p.199) can only be used on
+    /// a [`crate::netrunning::architecture::Floor::Password`] floor.
+    ///
+    /// See p.199 (Backdoor Interface Ability).
+    WrongFloorType {
+        /// Human-readable description of the expected floor type.
+        expected: &'static str,
+        /// Human-readable description of what was found instead.
+        found: &'static str,
+    },
     /// A Phase 2 catalog loader (skills, weapons, armor, …) failed to
     /// read or parse its on-disk RON file, or rejected the file's
     /// contents on a domain-level invariant (duplicate slug,
@@ -80,6 +87,9 @@ impl fmt::Display for RulesError {
             }
             RulesError::NoNetActionsRemaining => {
                 write!(f, "no NET Actions remaining for this turn")
+            }
+            RulesError::WrongFloorType { expected, found } => {
+                write!(f, "wrong floor type: expected {expected}, found {found}")
             }
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
