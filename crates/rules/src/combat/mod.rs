@@ -8,6 +8,15 @@
 //!
 //! - [`damage`] (WP-303) — damage pipeline and armor ablation.
 //! - [`dodge`] (WP-316) — REF≥8 dodge election helper.
+//! - [`grid`] (WP-302 placeholder) — 2D combat grid; replaced by WP-302.
+//! - [`turn_engine`] (WP-301) — initiative rolling, queue management, round lifecycle.
 
 pub mod damage;
 pub mod dodge;
+pub mod grid;
+pub mod turn_engine;
+
+pub use turn_engine::{
+    CombatState, CombatSummary, HeldAction, HoldTrigger, InitiativeEntry, PlannedAction,
+    TurnEndEvents,
+};
