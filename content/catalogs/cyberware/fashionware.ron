@@ -1,0 +1,116 @@
+// Fashionware (rulebook p.111 abbreviated, p.358 detailed).
+//
+// 7 Fashionware Option Slots are available; Fashionware items have no
+// foundational prerequisite and consume their slots category-globally
+// (p.111 "Options Slots" paragraph). Every Fashionware item carries
+// HL = 0 (N/A), so they all load as `HumanityLossSpec::None`.
+//
+// Schema: see crates/rules/src/catalog/cyberware.rs (CyberwareFileEntry).
+CyberwareFile(
+    cyberware: [
+        (
+            slug: "biomonitor",
+            display_name: "Biomonitor",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Subdermal implant which generates a constant LED readout of pulse, temperature, respiration, blood sugar, etc. You can link your Biomonitor to your Agent to allow it to track your wellness. See p.358.",
+        ),
+        (
+            slug: "chemskin",
+            display_name: "Chemskin",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            // The +2 to Personal Grooming requires *both* Chemskin and Techhair
+            // (book p.358); we don't model paired bonuses in the per-item
+            // effects list, so the bonus stays narrative for now.
+            effects: [],
+            description: "Dyes and pigments infused into the skin to permanently change its hue. Pigments can optionally be temperature-sensitive or reactant to hormone changes in the body. A user with Chemskin and Techhair adds +2 to their Personal Grooming Skill for having both (this bonus only applies once). See p.358.",
+        ),
+        (
+            slug: "emp_threading",
+            display_name: "EMP Threading",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Cheap,
+            price_eb: 10,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Popularized by the media sensation UR, these thin silver lines run in circuit-like patterns across the body. Many people believe they act as a 'Faraday cage' to protect against radiation and EMP effects, but no scientific backing. See p.358.",
+        ),
+        (
+            slug: "light_tattoo",
+            display_name: "Light Tattoo",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            // The +2 to Wardrobe & Style applies only when the user has three
+            // or more Light Tattoo installs — not modeled here as a flat
+            // EffectModifier; flagged in the description for the GM crate.
+            effects: [],
+            description: "Subdermal patches store light and project colored tattoos under the skin. The larger the piece, the more installations of this fashionware you need to complete it. A user with three or more Light Tattoo installations adds +2 to their Wardrobe & Style Skill (this bonus only applies once). See p.358.",
+        ),
+        (
+            slug: "shift_tacts",
+            display_name: "Shift Tacts",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Color-changing lenses implanted into the eye. Several patterns are also available; lenses can optionally be temperature-sensitive or reactant to hormone changes in the body. Only one choice of color and pattern can be made, but the user can deactivate the color change at any time without an Action. See p.358.",
+        ),
+        (
+            slug: "skinwatch",
+            display_name: "Skinwatch",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Subdermal implant generates a constant LED readout of the current time and date visible through the skin. See p.359.",
+        ),
+        (
+            slug: "techhair",
+            display_name: "Techhair",
+            category: Fashionware,
+            install_difficulty: Mall,
+            humanity_loss: None,
+            price: Premium,
+            price_eb: 100,
+            option_slots: 0,
+            slot_cost: 1,
+            prerequisite_slug: None,
+            effects: [],
+            description: "Color-light-emitting artificial hair. Hair can optionally be temperature sensitive, motorized to extend/retract, or reactant to hormone changes in the body. A user with Chemskin and Techhair adds +2 to their Personal Grooming Skill for having both (this bonus only applies once). See p.359.",
+        ),
+    ],
+)
