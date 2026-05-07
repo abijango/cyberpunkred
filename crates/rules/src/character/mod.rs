@@ -11,6 +11,7 @@
 //! states), pp.81–90 (skills).
 
 pub mod data;
+pub mod luck;
 
 pub use data::{
     AmmoKind, ArmorKind, ArmorPiece, InstalledCyberware, Inventory, ItemKind, ItemStack, Lifepath,

@@ -8,9 +8,11 @@
 pub mod character;
 pub mod dice;
 pub mod effects;
+pub mod error;
 pub mod resolution;
 pub mod rng;
 pub mod types;
 pub mod world;
 
+pub use error::RulesError;
 pub use rng::Rng;
