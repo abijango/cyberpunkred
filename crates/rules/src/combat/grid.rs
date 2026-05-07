@@ -866,7 +866,7 @@ mod tests {
         );
         // Must not still be at the origin.
         assert!(
-            g.occupants.get(&(0, 0)).is_none(),
+            !g.occupants.contains_key(&(0, 0)),
             "entity must no longer occupy origin after move"
         );
     }
@@ -920,7 +920,7 @@ mod tests {
         g.place(e, (3, 3));
         assert_eq!(g.position_of(e), Some((3, 3)));
         // No longer at old pos.
-        assert!(g.occupants.get(&(1, 1)).is_none());
+        assert!(!g.occupants.contains_key(&(1, 1)));
     }
 
     /// `move_entity` with an out-of-bounds destination returns `OutOfBounds`.
