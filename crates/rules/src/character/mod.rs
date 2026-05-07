@@ -14,6 +14,7 @@ pub mod data;
 pub mod derive;
 pub mod hp;
 pub mod luck;
+pub mod wounds;
 
 pub use data::{
     AmmoKind, ArmorKind, ArmorPiece, InstalledCyberware, Inventory, ItemKind, ItemStack, Lifepath,
