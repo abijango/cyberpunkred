@@ -13,5 +13,6 @@
 //!   See pp.198–199.
 
 pub mod abilities;
+pub mod actions;
 pub mod architecture;
 pub mod state;

@@ -33,6 +33,7 @@
 //! rules crate stays deterministic and WASM-compatible.
 
 use crate::effects::ProgramId;
+use crate::netrunning::actions::net_actions_per_turn;
 use crate::netrunning::architecture::NetArchId;
 use crate::types::{EntityId, DV};
 use serde::{Deserialize, Serialize};
@@ -187,9 +188,9 @@ pub enum VirusEffect {
 /// | 7–9            | 4           |
 /// | 10             | 5           |
 ///
-/// WP-403 will expose a standalone `net_actions_per_turn(rank)` function;
-/// this state struct embeds the computed value directly so each action
-/// site does not need to recompute it.
+/// [`super::actions::net_actions_per_turn`] is the single source of truth
+/// for this mapping (WP-403). This state struct embeds the computed value
+/// directly so each action site does not need to recompute it.
 ///
 /// See pp.197–200 (NET Actions, Interface Abilities), p.198 (Jack In/Out).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -279,7 +280,7 @@ impl NetrunState {
             queued_viruses: Vec::new(),
             cloak_dv: None,
             net_actions_used_this_turn: 0,
-            net_actions_max_this_turn: net_actions_for_rank(interface_rank),
+            net_actions_max_this_turn: net_actions_per_turn(interface_rank),
             program_id_counter: 0,
         }
     }
@@ -407,45 +408,13 @@ impl NetrunState {
     /// | 7–9            | 4           |
     /// | 10             | 5           |
     ///
-    /// WP-403 will expose this as a standalone public function
-    /// `net_actions_per_turn(rank)` to avoid duplication. This call site will
-    /// delegate to it once WP-403 lands.
+    /// Delegates to [`super::actions::net_actions_per_turn`] (WP-403) to
+    /// avoid duplication.
     ///
     /// See p.197 (NET Actions table), p.198 (each Turn).
     pub fn reset_turn(&mut self, interface_rank: u8) {
         self.net_actions_used_this_turn = 0;
-        self.net_actions_max_this_turn = net_actions_for_rank(interface_rank);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Internal helper: Interface rank → NET Actions
-// ---------------------------------------------------------------------------
-
-/// Map an Interface rank to the number of NET Actions per turn.
-///
-/// Per p.197 (NET Actions table). WP-403 will expose an identical public
-/// function `net_actions_per_turn(rank) -> u8` and both sites will then
-/// refer to that single source of truth. For now we embed the table here
-/// to keep WP-402 self-contained.
-///
-/// | Interface Rank | NET Actions |
-/// |----------------|-------------|
-/// | 1–3            | 2           |
-/// | 4–6            | 3           |
-/// | 7–9            | 4           |
-/// | 10+            | 5           |
-///
-/// Rank 0 is treated as rank 1 (minimum 2 actions) since Interface is at
-/// minimum rank 1 to Netrun at all (p.197: "Without it, you cannot Netrun").
-///
-/// See p.197 (NET Actions table).
-fn net_actions_for_rank(rank: u8) -> u8 {
-    match rank {
-        0..=3 => 2,
-        4..=6 => 3,
-        7..=9 => 4,
-        _ => 5, // rank 10+
+        self.net_actions_max_this_turn = net_actions_per_turn(interface_rank);
     }
 }
 
@@ -696,6 +665,9 @@ mod tests {
     /// `test_net_actions_per_interface_rank_matches_table`:
     /// Verify rank 1, 4, 7, 10 against the NET Actions table on p.197.
     ///
+    /// Delegates to `net_actions_per_turn` (WP-403); this test verifies the
+    /// integration from `state.rs` perspective.
+    ///
     /// Table (p.197):
     /// | Interface Rank | 1-3 | 4-6 | 7-9 | 10 |
     /// | NET Actions    |  2  |  3  |  4  |  5 |
@@ -703,36 +675,36 @@ mod tests {
     fn test_net_actions_per_interface_rank_matches_table() {
         // rank 1 → 2 actions
         assert_eq!(
-            net_actions_for_rank(1),
+            net_actions_per_turn(1),
             2,
             "rank 1 must give 2 NET Actions (p.197)"
         );
         // rank 4 → 3 actions
         assert_eq!(
-            net_actions_for_rank(4),
+            net_actions_per_turn(4),
             3,
             "rank 4 must give 3 NET Actions (p.197)"
         );
         // rank 7 → 4 actions
         assert_eq!(
-            net_actions_for_rank(7),
+            net_actions_per_turn(7),
             4,
             "rank 7 must give 4 NET Actions (p.197)"
         );
         // rank 10 → 5 actions
         assert_eq!(
-            net_actions_for_rank(10),
+            net_actions_per_turn(10),
             5,
             "rank 10 must give 5 NET Actions (p.197)"
         );
 
         // Spot-check additional ranks.
-        assert_eq!(net_actions_for_rank(2), 2, "rank 2 → 2");
-        assert_eq!(net_actions_for_rank(3), 2, "rank 3 → 2");
-        assert_eq!(net_actions_for_rank(5), 3, "rank 5 → 3");
-        assert_eq!(net_actions_for_rank(6), 3, "rank 6 → 3");
-        assert_eq!(net_actions_for_rank(8), 4, "rank 8 → 4");
-        assert_eq!(net_actions_for_rank(9), 4, "rank 9 → 4");
+        assert_eq!(net_actions_per_turn(2), 2, "rank 2 → 2");
+        assert_eq!(net_actions_per_turn(3), 2, "rank 3 → 2");
+        assert_eq!(net_actions_per_turn(5), 3, "rank 5 → 3");
+        assert_eq!(net_actions_per_turn(6), 3, "rank 6 → 3");
+        assert_eq!(net_actions_per_turn(8), 4, "rank 8 → 4");
+        assert_eq!(net_actions_per_turn(9), 4, "rank 9 → 4");
     }
 
     /// `test_program_instance_id_deterministic`:
