@@ -235,14 +235,7 @@ pub enum AmmoKind {
     Rocket,
 }
 
-/// Lifepath record.
-///
-/// **Stub.** WP-214 will replace this with the full Streetrat / Complete
-/// Lifepath structure (cultural origin, family, what shaped you, etc.,
-/// pp.230–254). Today it carries a single placeholder string so a
-/// `Character` can be constructed end-to-end.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Lifepath {
-    /// Free-form slug. Replaced by WP-214's structured fields.
-    pub placeholder: String,
-}
+// Lifepath is now defined by `crate::catalog::lifepath` (WP-214). The
+// re-export from `character/mod.rs` keeps the legacy
+// `crate::character::Lifepath` path working for downstream callers.
+pub use crate::catalog::lifepath::Lifepath;

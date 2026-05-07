@@ -1,0 +1,16 @@
+// What Do You Value Most? (rulebook p.48, left column). Roll 1d10.
+(
+    die: 10,
+    entries: [
+        (1, "Money"),
+        (2, "Honor"),
+        (3, "Your word"),
+        (4, "Honesty"),
+        (5, "Knowledge"),
+        (6, "Vengeance"),
+        (7, "Love"),
+        (8, "Power"),
+        (9, "Family"),
+        (10, "Friendship"),
+    ],
+)

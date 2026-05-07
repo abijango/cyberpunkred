@@ -1,0 +1,71 @@
+// Netrunner lifepath (rulebook pp.56–57).
+(
+    tables: [
+        ("runner_type", (
+            die: 6,
+            entries: [
+                (1, "Freelancer who will hack for hire."),
+                (2, "Corporate \"clone runner\" who hacks for the Man."),
+                (3, "Hacktivist interested in cracking systems and exposing bad guys."),
+                (4, "Just like to crack systems for the fun of it."),
+                (5, "Part of a regular team of freelancers."),
+                (6, "Hack for a Media, politico, or Lawman who hires you as needed."),
+            ],
+        )),
+        ("partner", (
+            die: 6,
+            entries: [
+                (1, "Family member"),
+                (2, "Old friend"),
+                (3, "Possible romantic partner as well"),
+                (4, "Secret partner who might be a rogue AI. Might."),
+                (5, "Secret partner with mob/gang connections"),
+                (6, "Secret partner with Corporate connections"),
+            ],
+        )),
+        ("workspace", (
+            die: 6,
+            entries: [
+                (1, "There are screens everywhere."),
+                (2, "It looks better in Virtuality, you swear."),
+                (3, "It's a filthy bed covered in wires."),
+                (4, "Corporate, modular, and utilitarian."),
+                (5, "Minimalist, clean, and organized."),
+                (6, "It's taken over your entire living space."),
+            ],
+        )),
+        ("other_clients", (
+            die: 6,
+            entries: [
+                (1, "Local Fixers who send you clients."),
+                (2, "Local gangers who also protect your work area while you sweep for NET threats."),
+                (3, "Corporate Execs who use you for \"black project\" work."),
+                (4, "Local Solos or other combat types who use you to keep their personal systems secure."),
+                (5, "Local Nomads and Fixers who use you to keep their family systems secure."),
+                (6, "You work for yourself and sell whatever data you can find on the NET."),
+            ],
+        )),
+        ("program_source", (
+            die: 6,
+            entries: [
+                (1, "Dig around in old abandoned City Zones."),
+                (2, "Steal them from other Netrunners you brain-burn."),
+                (3, "Have a local Fixer supply programs in exchange for hack work."),
+                (4, "Corporate Execs supply you with programs in exchange for your services."),
+                (5, "You have backdoors into a few Corporate warehouses."),
+                (6, "You hit the Night Markets and score programs whenever you can."),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "You think it might be a rogue AI or a NET Ghost. Either way, it's bad news."),
+                (2, "Rival Netrunners who just don't like you."),
+                (3, "Corporates who want you to work for them exclusively."),
+                (4, "Lawmen who consider you an illegal \"black hat\" and want to bust you."),
+                (5, "Old clients who think you screwed them over."),
+                (6, "Fixer or another client who wants your services exclusively."),
+            ],
+        )),
+    ],
+)

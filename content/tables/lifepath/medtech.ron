@@ -1,0 +1,64 @@
+// Medtech lifepath (rulebook pp.60–61).
+(
+    tables: [
+        ("medtech_type", (
+            die: 10,
+            entries: [
+                (1, "Surgeon"),
+                (2, "General Practitioner"),
+                (3, "Trauma Medic"),
+                (4, "Psychiatrist"),
+                (5, "Cyberpsycho Therapist"),
+                (6, "Ripperdoc"),
+                (7, "Cryosystems Operator"),
+                (8, "Pharmacist"),
+                (9, "Bodysculptor"),
+                (10, "Forensic Pathologist"),
+            ],
+        )),
+        ("partner", (
+            die: 6,
+            entries: [
+                (1, "Trauma Team group"),
+                (2, "Old friend"),
+                (3, "Possible romantic partner as well"),
+                (4, "Family member"),
+                (5, "Secret partner with mob/gang connections"),
+                (6, "Secret partner with Corporate connections"),
+            ],
+        )),
+        ("workspace", (
+            die: 6,
+            entries: [
+                (1, "Sterilized daily in the morning like clockwork."),
+                (2, "It's not state-of-the-art anymore, but it's comfortable to you."),
+                (3, "Your cryo equipment is also used to cool drinks."),
+                (4, "Everything possible is single-use and stored compacted until needed."),
+                (5, "Not as clean as many of your patients may have hoped."),
+                (6, "Meticulously organized, sharpened, and sterilized."),
+            ],
+        )),
+        ("main_clients", (
+            die: 6,
+            entries: [
+                (1, "Local Fixers who send you clients."),
+                (2, "Local gangers who also protect your work area or home in exchange for medical help."),
+                (3, "Corporate Execs who use you for \"black project\" medical work."),
+                (4, "Local Solos or other combat types who use you for medical help."),
+                (5, "Local Nomads and Fixers who bring you wounded clients."),
+                (6, "Trauma Team paramedical work."),
+            ],
+        )),
+        ("supply_source", (
+            die: 6,
+            entries: [
+                (1, "Scavenge stashes of medical supplies you find in abandoned City Zones."),
+                (2, "Strip parts from bodies after firefights."),
+                (3, "Have a local Fixer bring you supplies in exchange for medical work."),
+                (4, "Corporate Execs or Trauma Team supply you with stuff in exchange for your services."),
+                (5, "You have a backdoor into a few Corporate or Hospital warehouses."),
+                (6, "You hit the Night Markets and score deals whenever you can."),
+            ],
+        )),
+    ],
+)

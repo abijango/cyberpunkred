@@ -1,0 +1,51 @@
+// Solo lifepath (rulebook p.55).
+//
+// All four sub-tables are 1d6.
+(
+    tables: [
+        ("solo_type", (
+            die: 6,
+            entries: [
+                (1, "Bodyguard"),
+                (2, "Street Muscle for Hire"),
+                (3, "Corporate Enforcer who takes jobs on the side"),
+                (4, "Corporate or Freelance Black Ops Agent"),
+                (5, "Local Vigilante for Hire"),
+                (6, "Assassin/Hitman for Hire"),
+            ],
+        )),
+        ("moral_compass", (
+            die: 6,
+            entries: [
+                (1, "Always working for good, trying to take out the \"bad guys.\""),
+                (2, "Always spare the innocent (elderly, women, children, pets)."),
+                (3, "Will occasionally slip and do unethical or bad things, but it's rare."),
+                (4, "Ruthless and profit centered; you will work for anyone, take any job for the money."),
+                (5, "Willing to bend the rules (and the law) to get the job done."),
+                (6, "Totally evil. You engage in illegal, unethical work all the time; in fact, you enjoy it."),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "A Corporation you may have angered."),
+                (2, "A boostergang you may have tackled earlier."),
+                (3, "Corrupt Lawmen or Lawmen who mistakenly think you're guilty of something."),
+                (4, "A rival Solo from another Corp."),
+                (5, "A Fixer who sees you as a threat."),
+                (6, "A rival Solo who sees you as their nemesis."),
+            ],
+        )),
+        ("operational_territory", (
+            die: 6,
+            entries: [
+                (1, "A Corporate Zone"),
+                (2, "Combat Zones"),
+                (3, "The whole City"),
+                (4, "The territory of a single Corporation"),
+                (5, "The territory of a particular Fixer or contact"),
+                (6, "Wherever the money takes you"),
+            ],
+        )),
+    ],
+)

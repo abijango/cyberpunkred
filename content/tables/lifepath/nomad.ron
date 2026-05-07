@@ -1,0 +1,97 @@
+// Nomad lifepath (rulebook pp.68–69).
+//
+// "Is Your Pack Based on Land, Air, or Sea?" is choose-only on p.68.
+// The character creator records the choice directly in
+// `NomadLifepath::land_air_sea`. The corresponding pack-business
+// table is selected at character-creation time:
+//   - land  -> nomad_land  (1d10)
+//   - air   -> nomad_air   (1d6)
+//   - sea   -> nomad_sea   (1d6)
+//
+// All three are present in this file so any choice loads the
+// matching table.
+(
+    tables: [
+        ("pack_size", (
+            die: 6,
+            entries: [
+                (1, "A single extended tribe or family"),
+                (2, "A couple dozen members"),
+                (3, "Forty or fifty members"),
+                (4, "A hundred or more members"),
+                (5, "A Blood Family (hundreds of members)"),
+                (6, "An Affiliated Family (made of several Blood Families)"),
+            ],
+        )),
+        ("nomad_land", (
+            die: 10,
+            entries: [
+                (1, "Gogang"),
+                (2, "Passenger transport"),
+                (3, "Chautauqua/school"),
+                (4, "Traveling show/carnival"),
+                (5, "Migrant Farmers"),
+                (6, "Cargo transport"),
+                (7, "Shipment protection"),
+                (8, "Smuggling"),
+                (9, "Mercenary army"),
+                (10, "Construction work gang"),
+            ],
+        )),
+        ("nomad_air", (
+            die: 6,
+            entries: [
+                (1, "Air piracy"),
+                (2, "Cargo transport"),
+                (3, "Passenger transport"),
+                (4, "Aircraft protection"),
+                (5, "Smuggling"),
+                (6, "Combat support"),
+            ],
+        )),
+        ("nomad_sea", (
+            die: 6,
+            entries: [
+                (1, "Piracy"),
+                (2, "Cargo transport"),
+                (3, "Passenger transport"),
+                (4, "Smuggling"),
+                (5, "Combat support"),
+                (6, "Submarine warfare"),
+            ],
+        )),
+        ("personal_role", (
+            die: 6,
+            entries: [
+                (1, "Scout (negotiator)"),
+                (2, "Outrider (protection, weapons)"),
+                (3, "Transport pilot/driver"),
+                (4, "Loadmaster (large cargo mover, trucker)"),
+                (5, "Solo smuggler"),
+                (6, "Procurement (fuel, vehicles, etc.)"),
+            ],
+        )),
+        ("philosophy", (
+            die: 6,
+            entries: [
+                (1, "Always working for good; your Pack accepts others, just wants to get along."),
+                (2, "It's more like a family business. Operates as a fair and honest concern."),
+                (3, "Will occasionally slip and do unethical things, but it's rare."),
+                (4, "Willing to bend the rules whenever they get in the way to get what the Pack needs."),
+                (5, "Ruthless and self-centered, willing to do some bad things if it will get the Pack ahead."),
+                (6, "Totally evil. You rage up and down the highways, killing, looting, and just terrorizing everyone."),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "Organized Crime"),
+                (2, "Boostergangs"),
+                (3, "Drug Runners"),
+                (4, "Dirty Politicians"),
+                (5, "Rival Packs in the same businesses"),
+                (6, "Dirty Cops"),
+            ],
+        )),
+    ],
+)

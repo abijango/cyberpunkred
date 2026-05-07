@@ -1,0 +1,16 @@
+// Affectation You Are Never Without (rulebook p.47, bottom). Roll 1d10.
+(
+    die: 10,
+    entries: [
+        (1, "Tattoos"),
+        (2, "Mirrorshades"),
+        (3, "Ritual scars"),
+        (4, "Spiked gloves"),
+        (5, "Nose rings"),
+        (6, "Tongue or other piercings"),
+        (7, "Strange fingernail implants"),
+        (8, "Spiked boots or heels"),
+        (9, "Fingerless gloves"),
+        (10, "Strange contacts"),
+    ],
+)

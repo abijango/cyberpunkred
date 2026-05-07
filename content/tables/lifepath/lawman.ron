@@ -1,0 +1,60 @@
+// Lawman lifepath (rulebook p.65).
+(
+    tables: [
+        ("position", (
+            die: 6,
+            entries: [
+                (1, "Guard"),
+                (2, "Standard Beat or Patrol"),
+                (3, "Criminal Investigation"),
+                (4, "Special Weapons and Tactics"),
+                (5, "Motor Patrol"),
+                (6, "Internal Affairs"),
+            ],
+        )),
+        ("jurisdiction", (
+            die: 6,
+            entries: [
+                (1, "Corporate Zones"),
+                (2, "Standard City Patrol Zone"),
+                (3, "Combat Zones"),
+                (4, "Outer City"),
+                (5, "Recovery Zones"),
+                (6, "Open Highways"),
+            ],
+        )),
+        ("corruption", (
+            die: 6,
+            entries: [
+                (1, "Fair, honest policing, strong ethical practices."),
+                (2, "Fair and honest policing, but hard on lawbreakers."),
+                (3, "Will occasionally slip and do unethical things, but it's rare."),
+                (4, "Willing to bend any rules to get the bad guys."),
+                (5, "Ruthless and determined to control The Street, even if it means breaking the law."),
+                (6, "Totally corrupt. You take bribes, engage in illegal, and unethical business all the time."),
+            ],
+        )),
+        ("whos_gunning", (
+            die: 6,
+            entries: [
+                (1, "Organized Crime"),
+                (2, "Boostergangs"),
+                (3, "Police Accountability Group"),
+                (4, "Dirty Politicians"),
+                (5, "Smugglers"),
+                (6, "Street Criminals"),
+            ],
+        )),
+        ("major_target", (
+            die: 6,
+            entries: [
+                (1, "Organized Crime"),
+                (2, "Boostergangs"),
+                (3, "Drug Runners"),
+                (4, "Dirty Politicians"),
+                (5, "Smugglers"),
+                (6, "Street Crime"),
+            ],
+        )),
+    ],
+)
