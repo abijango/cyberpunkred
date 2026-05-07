@@ -24,3 +24,4 @@
 pub mod cloak;
 pub mod eye_dee;
 pub mod scanner;
+pub mod zap;
