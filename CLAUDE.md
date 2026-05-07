@@ -4,11 +4,12 @@ You are working on a Rust workspace implementing a *Cyberpunk RED* solo CRPG. Th
 
 ## Read these in order
 
-1. `IMPLEMENTATION_PLAN.md` §0–§3. Skim. This is your map.
-2. `IMPLEMENTATION_PLAN.md` §5 (Coordination Protocols). Read carefully. This is how you avoid stepping on other agents.
-3. The Work Package you've been assigned, in §4. Read in full.
-4. Every WP your assigned WP `Depends on:`. Read **only their public API** unless you have a coordination need.
-5. The rulebook page references in your WP. The PDF is developer-provided (not checked in) at `rulebook/Cyberpunk_Red_Core-Digital_v1.25.pdf` (workspace root). Read the cited pages directly with the `Read` tool's `pages:` parameter; don't skim — Cyberpunk Red has subtle interactions. The page reference is the spec.
+1. `STATUS.md` at the repo root. **Read first.** Snapshot of phase progress, workflow lessons learned in prior waves, known follow-ups / debt, and an architectural map of the rules crate. The plan is the spec; STATUS.md is the audit log of what was actually built and what's flagged for follow-up.
+2. `IMPLEMENTATION_PLAN.md` §0–§3. Skim. This is your map.
+3. `IMPLEMENTATION_PLAN.md` §5 (Coordination Protocols). Read carefully. This is how you avoid stepping on other agents.
+4. The Work Package you've been assigned, in §4. Read in full.
+5. Every WP your assigned WP `Depends on:`. Read **only their public API** unless you have a coordination need.
+6. The rulebook page references in your WP. The PDF is developer-provided (not checked in) at `rulebook/Cyberpunk_Red_Core-Digital_v1.25.pdf` (workspace root). Read the cited pages directly with the `Read` tool's `pages:` parameter; don't skim — Cyberpunk Red has subtle interactions. The page reference is the spec.
 
 ## Working rules
 
@@ -56,3 +57,7 @@ When you are done:
 3. CI is green.
 
 Then stop. Don't start the next WP — there's an assignment process.
+
+## Updating STATUS.md
+
+If you are an orchestrator agent (running waves of WPs, not implementing one yourself), update `STATUS.md` at the close of each major work session: refresh the phase progress table, record any new follow-ups or deferred debt, and capture workflow lessons learned. Future sessions pick up from STATUS.md, so its accuracy matters.
