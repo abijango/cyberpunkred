@@ -1,0 +1,118 @@
+// Street drugs catalog — Cyberpunk RED (rulebook pp.227–228, with
+// Smash and Synthcoke continuing onto p.229). One entry per drug listed
+// in the *Street Drugs* section.
+//
+// Schema: every entry has
+//   slug: string                 // catalog lookup key (also Drug::id)
+//   display_name: string         // book display name
+//   effects: [EffectModifier]    // Primary-Effect modifiers (see below)
+//   duration: EffectDuration     // Primary-Effect duration
+//   addictive: bool              // true iff the drug has a Secondary
+//                                //   Effect that creates addiction
+//   price: PriceTier             // Night-Market tier (p.339)
+//   price_eb: Eurobucks          // canonical cost for the tier
+//   description: string          // distilled rulebook flavour
+//
+// Effects encoding notes:
+// - Only Primary-Effect modifiers are stored. Secondary (addiction)
+//   effects fire only on a failed WILL+Resist Torture/Drugs roll vs.
+//   the drug's DV (p.227 intro), and are applied as a separate
+//   ActiveEffect by whatever subsystem implements addiction
+//   resolution.
+// - Drugs whose Primary Effect is purely narrative (Blue Glass's
+//   "flashing out" hallucinations) or whose rules-level effect is
+//   conditional and applied by a dedicated subsystem (Black Lace's
+//   "ignores Seriously Wounded") have an empty `effects` list. The
+//   `description` field carries the literal book wording so the LLM
+//   narrator can render it.
+// - Durations: the book uses wall-clock hours (4h or 24h) but the
+//   EffectDuration enum has no Hours variant; we encode every drug as
+//   UntilGigEnd as the closest faithful RAW match. See drugs.rs module
+//   docs for the limitation.
+DrugsFile(
+    drugs: [
+        // -- Black Lace (p.227) --
+        (
+            slug: "black_lace",
+            display_name: "Black Lace",
+            // Primary Effect ignores Seriously-Wounded penalties; that
+            // is conditional state masking, not a static modifier.
+            // Modelled as an empty list — the combat engine consults
+            // active drug effects when evaluating wound-state action
+            // penalties (future WP).
+            effects: [],
+            duration: UntilGigEnd,
+            addictive: true,
+            price: Costly,
+            price_eb: (50),
+            description: "Lasts 24 hours. The user takes 2d6 Humanity Loss upon dosing, returned if the user isn't affected by the Secondary Effect (DV17). For the Primary Effect's duration the user ignores the effects of the Seriously Wounded Wound State. Addicted users have their REF lowered by 2 points unless currently dosed. See p.227.",
+        ),
+
+        // -- Blue Glass (pp.227–228) --
+        (
+            slug: "blue_glass",
+            display_name: "Blue Glass",
+            // Primary Effect: occasional GM-driven loss of an Action
+            // (a Turn) due to "flashing out." Not a fixed modifier;
+            // applied at GM discretion.
+            effects: [],
+            duration: UntilGigEnd,
+            addictive: true,
+            price: Everyday,
+            price_eb: (20),
+            description: "Lasts 4 hours. The GM occasionally tells the user when they are 'flashing out' — hallucinating swirls of colour in short bursts that cost the user that Turn's Action. Secondary Effect (DV15) creates addiction; an addicted user becomes immune to flashing out and instead takes the drug for stability. See pp.227–228.",
+        ),
+
+        // -- Boost (p.228) --
+        (
+            slug: "boost",
+            display_name: "Boost",
+            // Primary Effect: +2 INT, can raise INT above 8.
+            effects: [
+                StatBonus(stat: Int, by: 2),
+            ],
+            duration: UntilGigEnd,
+            addictive: true,
+            price: Costly,
+            price_eb: (50),
+            description: "Lasts 24 hours. For the Primary Effect's duration the user's INT increases by 2 points; this can raise INT above 8. Secondary Effect (DV17) creates addiction; an addicted user has their INT lowered by 2 points unless currently dosed. See p.228.",
+        ),
+
+        // -- Smash (p.229) --
+        (
+            slug: "smash",
+            display_name: "Smash",
+            // Primary Effect: +2 to Dance, Contortionist, Conversation,
+            // Human Perception, Persuasion, and Acting. Encoded as one
+            // SkillBonus per affected skill.
+            effects: [
+                SkillBonus(skill: Dance, by: 2),
+                SkillBonus(skill: Contortionist, by: 2),
+                SkillBonus(skill: Conversation, by: 2),
+                SkillBonus(skill: HumanPerception, by: 2),
+                SkillBonus(skill: Persuasion, by: 2),
+                SkillBonus(skill: Acting, by: 2),
+            ],
+            duration: UntilGigEnd,
+            addictive: true,
+            price: Cheap,
+            price_eb: (10),
+            description: "Lasts 4 hours. Yellow, foamy, and sold in cans everywhere. For the Primary Effect's duration the user feels euphoric and gains +2 to Dance, Contortionist, Conversation, Human Perception, Persuasion, and Acting. Secondary Effect (DV15) creates addiction; an addicted user feels a loss of interest and takes -2 to those same Skills unless currently dosed. See p.229.",
+        ),
+
+        // -- Synthcoke (p.229) --
+        (
+            slug: "synthcoke",
+            display_name: "Synthcoke",
+            // Primary Effect: +1 REF, can raise REF above 8.
+            effects: [
+                StatBonus(stat: Ref, by: 1),
+            ],
+            duration: UntilGigEnd,
+            addictive: true,
+            price: Everyday,
+            price_eb: (20),
+            description: "Lasts 4 hours. For the Primary Effect's duration the user's REF increases by 1 point and can rise above 8; the user is also prone to paranoid ideation. Secondary Effect (DV15) creates addiction; an addicted user has their REF lowered by 2 points unless currently dosed. See p.229.",
+        ),
+    ],
+)
