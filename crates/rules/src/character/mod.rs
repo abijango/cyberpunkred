@@ -134,12 +134,12 @@ mod tests {
             }],
             armor: WornArmor {
                 head: Some(ArmorPiece {
-                    kind: ArmorKind::Placeholder("light_armorjack".into()),
+                    kind: ArmorKind::LightArmorjack,
                     current_sp: 11,
                     max_sp: 11,
                 }),
                 body: Some(ArmorPiece {
-                    kind: ArmorKind::Placeholder("light_armorjack".into()),
+                    kind: ArmorKind::LightArmorjack,
                     current_sp: 10,
                     max_sp: 11,
                 }),

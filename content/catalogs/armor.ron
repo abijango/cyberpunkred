@@ -1,0 +1,132 @@
+// Armor catalog — Cyberpunk RED (rulebook p.185, "Armor Table"; p.184 for
+// the surrounding rules: Stopping Power, Armor Penalty taken-once, and the
+// no-stacking rule).
+//
+// Schema: every entry has
+//   slug: string             // catalog lookup key (must equal id.0)
+//   id: ArmorId              // structured handle ("slug")
+//   display_name: string     // book display name (preserves ® marks)
+//   kind: ArmorKind          // closed-enum kind
+//   sp: u8                   // Stopping Power as printed on p.185
+//   penalty: ArmorPenalty    // u8 magnitudes; book values are negative
+//   locations: [ArmorLocation, ...]  // [Body, Head] for every p.185 entry
+//   price: PriceTier         // Cost column on p.185
+//   price_eb: Eurobucks      // canonical eurobuck cost (p.185, agrees
+//                            // with PriceTier::canonical_cost)
+//
+// Penalty fields are stored as unsigned magnitudes — the book prints
+// "-2 REF, DEX, and MOVE" but the column header on p.185 also says
+// "Minimum 0", so callers subtract the magnitude after the usual stat
+// arithmetic. See `crates/rules/src/catalog/armor.rs` for the loader and
+// the no-stacking-at-this-layer note.
+ArmorFile(
+    armor: [
+        // Leathers — SP 4, no penalty, 20eb / Everyday. See p.185.
+        // "Favored by Nomads and other 'punks who ride bikes."
+        (
+            slug: "leathers",
+            id: ("leathers"),
+            display_name: "Leathers",
+            kind: Leathers,
+            sp: 4,
+            penalty: (ref_penalty: 0, dex_penalty: 0, move_penalty: 0),
+            locations: [Body, Head],
+            price: Everyday,
+            price_eb: (20),
+        ),
+        // Kevlar® — SP 7, no penalty, 50eb / Costly. See p.185.
+        // "Can be made into clothes, vests, jackets, business suits, and even bikinis."
+        (
+            slug: "kevlar",
+            id: ("kevlar"),
+            display_name: "Kevlar®",
+            kind: Kevlar,
+            sp: 7,
+            penalty: (ref_penalty: 0, dex_penalty: 0, move_penalty: 0),
+            locations: [Body, Head],
+            price: Costly,
+            price_eb: (50),
+        ),
+        // Light Armorjack — SP 11, no penalty, 100eb / Premium. See p.185.
+        // "A combination of Kevlar® and plastic meshes inserted into the weave of the fabric."
+        (
+            slug: "light_armorjack",
+            id: ("light_armorjack"),
+            display_name: "Light Armorjack",
+            kind: LightArmorjack,
+            sp: 11,
+            penalty: (ref_penalty: 0, dex_penalty: 0, move_penalty: 0),
+            locations: [Body, Head],
+            price: Premium,
+            price_eb: (100),
+        ),
+        // Bodyweight Suit — SP 11, no penalty, 1,000eb / Very Expensive. See p.185.
+        // "Skinsuit with impact absorbing, sintered armorgel layered in key body
+        //  areas. Also has a place to store your Cyberdeck and supports your
+        //  Interface Plugs."
+        (
+            slug: "bodyweight_suit",
+            id: ("bodyweight_suit"),
+            display_name: "Bodyweight Suit",
+            kind: BodyweightSuit,
+            sp: 11,
+            penalty: (ref_penalty: 0, dex_penalty: 0, move_penalty: 0),
+            locations: [Body, Head],
+            price: VeryExpensive,
+            price_eb: (1000),
+        ),
+        // Medium Armorjack — SP 12, -2 REF/DEX/MOVE, 100eb / Premium. See p.185.
+        // "Heavier Armorjack, with solid plastic plating, reinforced with thicker Kevlar® mesh."
+        (
+            slug: "medium_armorjack",
+            id: ("medium_armorjack"),
+            display_name: "Medium Armorjack",
+            kind: MediumArmorjack,
+            sp: 12,
+            penalty: (ref_penalty: 2, dex_penalty: 2, move_penalty: 2),
+            locations: [Body, Head],
+            price: Premium,
+            price_eb: (100),
+        ),
+        // Heavy Armorjack — SP 13, -2 REF/DEX/MOVE, 500eb / Expensive. See p.185.
+        // "The thickest Armorjack, combining denser Kevlar® and a layered mix of plastic and mesh weaves."
+        (
+            slug: "heavy_armorjack",
+            id: ("heavy_armorjack"),
+            display_name: "Heavy Armorjack",
+            kind: HeavyArmorjack,
+            sp: 13,
+            penalty: (ref_penalty: 2, dex_penalty: 2, move_penalty: 2),
+            locations: [Body, Head],
+            price: Expensive,
+            price_eb: (500),
+        ),
+        // Flak — SP 15, -4 REF/DEX/MOVE, 500eb / Expensive. See p.185.
+        // "This is the 21st century version of the time honored flak vest and pants."
+        (
+            slug: "flak",
+            id: ("flak"),
+            display_name: "Flak",
+            kind: Flak,
+            sp: 15,
+            penalty: (ref_penalty: 4, dex_penalty: 4, move_penalty: 4),
+            locations: [Body, Head],
+            price: Expensive,
+            price_eb: (500),
+        ),
+        // Metalgear® — SP 18, -4 REF/DEX/MOVE, 5,000eb / Luxury. See p.185.
+        // "Metalgear® will stop almost anything, but you're going to be easier to hit
+        //  than a one-legged bantha in a potho race."
+        (
+            slug: "metalgear",
+            id: ("metalgear"),
+            display_name: "Metalgear®",
+            kind: Metalgear,
+            sp: 18,
+            penalty: (ref_penalty: 4, dex_penalty: 4, move_penalty: 4),
+            locations: [Body, Head],
+            price: Luxury,
+            price_eb: (5000),
+        ),
+    ],
+)
