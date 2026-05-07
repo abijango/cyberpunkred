@@ -45,6 +45,28 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
+    /// A NET Action was attempted but no netrun is currently active on
+    /// `World::netrun`.
+    ///
+    /// The Netrunner must Jack In first (p.198) before any Interface
+    /// Ability (save Scanner) can be used.
+    ///
+    /// See p.198 (Jack In/Out).
+    NetrunNotActive,
+    /// A Control (or other floor-targeted) ability was used on a floor
+    /// index that does not match the Netrunner's current floor.
+    ///
+    /// See p.199 (Control): "Take a Control Node at current floor."
+    NotAControlNode {
+        /// The floor index the action targeted.
+        floor_idx: usize,
+    },
+    /// A NET Action was attempted but the Netrunner has already consumed
+    /// all their NET Actions for this turn.
+    ///
+    /// See p.197 (NET Actions per turn table): the number of NET Actions is
+    /// determined by Interface rank.
+    NoNetActionsRemaining,
 }
 
 impl fmt::Display for RulesError {
@@ -62,6 +84,16 @@ impl fmt::Display for RulesError {
             }
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
+            }
+            RulesError::NetrunNotActive => write!(
+                f,
+                "no active netrun: must Jack In before using Interface Abilities"
+            ),
+            RulesError::NotAControlNode { floor_idx } => {
+                write!(f, "floor {floor_idx} is not a Control Node")
+            }
+            RulesError::NoNetActionsRemaining => {
+                write!(f, "no NET Actions remaining this turn")
             }
         }
     }
