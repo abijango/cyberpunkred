@@ -11,7 +11,10 @@
 //!   control nodes held, viruses queued. See pp.197–200.
 //! - [`abilities`] — Interface Abilities (Scanner, Backdoor, Cloak, etc.).
 //!   See pp.198–199.
+//! - [`virus`] — Virus deployment: install a persistent [`Virus`] at the
+//!   bottom floor so its effect survives jack-out. See p.200.
 
 pub mod abilities;
 pub mod architecture;
 pub mod state;
+pub mod virus;

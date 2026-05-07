@@ -45,6 +45,33 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
+    /// A NET Action was attempted but no netrun is currently active on
+    /// `World::netrun`.
+    ///
+    /// The Netrunner must Jack In first (p.198) before any Interface
+    /// Ability (save Scanner) can be used.
+    ///
+    /// See p.198 (Jack In/Out).
+    NetrunNotActive,
+    /// A NET Action was attempted but the Netrunner has already consumed
+    /// all their NET Actions for this turn.
+    ///
+    /// See p.197 (NET Actions per turn table): the number of NET Actions is
+    /// determined by Interface rank.
+    NoNetActionsRemaining,
+    /// A Virus deployment was attempted but the Netrunner is not on the
+    /// bottom (deepest) floor of the NET Architecture.
+    ///
+    /// Per p.200: "Once you have reached the lowest level of the NET
+    /// Architecture you can leave your own Virus in the Architecture."
+    ///
+    /// See p.200 (Virus Interface Ability).
+    NotOnBottomFloor {
+        /// The floor the Netrunner is currently on (0-indexed from top).
+        current_floor: usize,
+        /// The index of the deepest revealed floor (`revealed_floors - 1`).
+        bottom_floor: usize,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -63,6 +90,22 @@ impl fmt::Display for RulesError {
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
             }
+            RulesError::NetrunNotActive => {
+                write!(
+                    f,
+                    "no active netrun: must Jack In before using Interface Abilities"
+                )
+            }
+            RulesError::NoNetActionsRemaining => {
+                write!(f, "no NET Actions remaining this turn")
+            }
+            RulesError::NotOnBottomFloor {
+                current_floor,
+                bottom_floor,
+            } => write!(
+                f,
+                "cannot deploy Virus: at floor {current_floor}, but must be on the bottom floor {bottom_floor} (p.200)"
+            ),
         }
     }
 }
