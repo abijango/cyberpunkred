@@ -5,6 +5,7 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §1.4 (single-source-of-truth) and §2 (conventions).
 
+pub mod catalog;
 pub mod character;
 pub mod checks;
 pub mod dice;
@@ -16,5 +17,10 @@ pub mod rng;
 pub mod types;
 pub mod world;
 
+pub use catalog::skills::{
+    Instrument, LanguageKind, LocalArea, MartialArtsForm, ScienceField, SkillCategory,
+    SkillDefinition, SkillId,
+};
+pub use catalog::Catalog;
 pub use error::RulesError;
 pub use rng::Rng;

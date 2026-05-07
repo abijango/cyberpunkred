@@ -8,6 +8,7 @@
 
 use crate::types::EntityId;
 use std::fmt;
+use std::path::PathBuf;
 
 /// Failure modes raised by the `cpr_rules` crate.
 ///
@@ -31,6 +32,19 @@ pub enum RulesError {
     /// PC nor any on-scene NPC. Raised by check / attack resolutions
     /// when the actor (or defender) cannot be found.
     EntityNotFound(EntityId),
+    /// A Phase 2 catalog loader (skills, weapons, armor, …) failed to
+    /// read or parse its on-disk RON file, or rejected the file's
+    /// contents on a domain-level invariant (duplicate slug,
+    /// linked-stat disagreement, etc.). The `path` and `source` are
+    /// surfaced for diagnostic logging in `tools/content-validator`.
+    CatalogLoadFailed {
+        /// Filesystem path that the loader attempted to read.
+        path: PathBuf,
+        /// Stringified description of the underlying failure (an I/O
+        /// error message, a RON parse error, or a loader-enforced
+        /// invariant violation).
+        source: String,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -46,8 +60,49 @@ impl fmt::Display for RulesError {
             RulesError::EntityNotFound(id) => {
                 write!(f, "entity not found in world: {:?}", id.0)
             }
+            RulesError::CatalogLoadFailed { path, source } => {
+                write!(f, "catalog load failed for {}: {source}", path.display())
+            }
         }
     }
 }
 
 impl std::error::Error for RulesError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use uuid::Uuid;
+
+    #[test]
+    fn test_insufficient_luck_display() {
+        let e = RulesError::InsufficientLuck {
+            requested: 5,
+            available: 2,
+        };
+        let s = format!("{e}");
+        assert!(s.contains("insufficient LUCK"));
+        assert!(s.contains("5"));
+        assert!(s.contains("2"));
+    }
+
+    #[test]
+    fn test_entity_not_found_display() {
+        let id = EntityId(Uuid::from_u128(0xC0FFEE));
+        let e = RulesError::EntityNotFound(id);
+        let s = format!("{e}");
+        assert!(s.contains("entity not found"));
+    }
+
+    #[test]
+    fn test_catalog_load_failed_display() {
+        let e = RulesError::CatalogLoadFailed {
+            path: PathBuf::from("content/catalogs/skills.ron"),
+            source: "boom".to_string(),
+        };
+        let s = format!("{e}");
+        assert!(s.contains("catalog load failed"));
+        assert!(s.contains("skills.ron"));
+        assert!(s.contains("boom"));
+    }
+}

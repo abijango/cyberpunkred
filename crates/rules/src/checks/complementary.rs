@@ -127,7 +127,7 @@ mod tests {
         let mut pc = fresh_pc();
         pc.id = CharacterId(Uuid::from_u128(0xC0));
         pc.stats.int = 5;
-        pc.skills.ranks.insert(SkillId("education".into()), 4);
+        pc.skills.ranks.insert(SkillId::Education, 4);
         let eid = EntityId(pc.id.0);
         (pc, eid)
     }
@@ -138,8 +138,8 @@ mod tests {
         // With a pending bonus, modifier_total must be exactly +1 higher.
         let (mut pc, actor) = make_pc();
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("education".into()),
-            granted_by: SkillId("library_search".into()),
+            target_skill: SkillId::Education,
+            granted_by: SkillId::LibrarySearch,
             consumed: false,
         });
         let mut world = World::new(pc);
@@ -149,7 +149,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -170,8 +170,8 @@ mod tests {
         // Run two checks back-to-back. The second one must NOT receive +1.
         let (mut pc, actor) = make_pc();
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("education".into()),
-            granted_by: SkillId("library_search".into()),
+            target_skill: SkillId::Education,
+            granted_by: SkillId::LibrarySearch,
             consumed: false,
         });
         let mut world = World::new(pc);
@@ -182,7 +182,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -208,13 +208,15 @@ mod tests {
         // exactly one entry (per p.130). On the next check, only +1 lands.
         let (mut pc, actor) = make_pc();
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("education".into()),
-            granted_by: SkillId("library_search".into()),
+            target_skill: SkillId::Education,
+            granted_by: SkillId::LibrarySearch,
             consumed: false,
         });
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("education".into()),
-            granted_by: SkillId("local_expert".into()),
+            target_skill: SkillId::Education,
+            granted_by: SkillId::LocalExpert(crate::catalog::skills::LocalArea::Custom(
+                "placeholder".into(),
+            )),
             consumed: false,
         });
         assert_eq!(
@@ -230,7 +232,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -245,16 +247,16 @@ mod tests {
     #[test]
     fn test_take_returns_none_when_no_bonus() {
         let mut pc = fresh_pc();
-        let result = pc.take_complementary_bonus(&SkillId("education".into()));
+        let result = pc.take_complementary_bonus(&SkillId::Education);
         assert!(result.is_none(), "no pending bonus → None");
 
         // Adding a bonus for a different skill must not satisfy the take.
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("brawling".into()),
-            granted_by: SkillId("athletics".into()),
+            target_skill: SkillId::Brawling,
+            granted_by: SkillId::Athletics,
             consumed: false,
         });
-        let result = pc.take_complementary_bonus(&SkillId("education".into()));
+        let result = pc.take_complementary_bonus(&SkillId::Education);
         assert!(
             result.is_none(),
             "bonus on a different target skill must not satisfy the take"
@@ -270,10 +272,10 @@ mod tests {
         let mut pc = fresh_pc();
         pc.id = CharacterId(Uuid::from_u128(0xC0));
         pc.stats.r#ref = 6;
-        pc.skills.ranks.insert(SkillId("handgun".into()), 4);
+        pc.skills.ranks.insert(SkillId::Handgun, 4);
         pc.add_complementary_bonus(ComplementaryBonus {
-            target_skill: SkillId("concentration".into()),
-            granted_by: SkillId("meditation".into()),
+            target_skill: SkillId::Concentration,
+            granted_by: SkillId::Concentration,
             consumed: false,
         });
         let actor = EntityId(pc.id.0);
@@ -285,7 +287,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Ref,
-            skill: SkillId("handgun".into()),
+            skill: SkillId::Handgun,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -299,7 +301,7 @@ mod tests {
         // The unrelated Concentration bonus must still be pending.
         let bonuses = &world.entity(actor).unwrap().complementary_bonuses;
         assert_eq!(bonuses.len(), 1);
-        assert_eq!(bonuses[0].target_skill, SkillId("concentration".into()));
+        assert_eq!(bonuses[0].target_skill, SkillId::Concentration);
         assert!(!bonuses[0].consumed);
     }
 }
