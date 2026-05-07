@@ -1,0 +1,11 @@
+//! Netrunning subsystem — NET architecture model, state, and procedural generation.
+//!
+//! This module implements the rules for jacking into and navigating NET
+//! Architectures in *Cyberpunk RED*. See pp.209–218 for the rulebook foundation.
+//!
+//! ## Modules
+//!
+//! - [`architecture`] — NET architecture data model and procedural generator
+//!   ([`architecture::generate_net_architecture`]). See pp.209–212, 217.
+
+pub mod architecture;
