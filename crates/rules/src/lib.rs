@@ -13,6 +13,7 @@ pub mod dice;
 pub mod effects;
 pub mod error;
 pub mod movement;
+pub mod netrunning;
 pub mod resolution;
 pub mod rng;
 pub mod types;
