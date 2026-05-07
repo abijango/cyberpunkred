@@ -639,9 +639,7 @@ mod tests {
             Some(4)
         );
         // Different LocalArea string → different key.
-        assert!(m
-            .get(&SkillId::LocalExpert(LocalArea::Custom("Heywood".into())))
-            .is_none());
+        assert!(!m.contains_key(&SkillId::LocalExpert(LocalArea::Custom("Heywood".into()))));
     }
 
     /// Regression: every `SkillDefinition` loaded from the RON file has
