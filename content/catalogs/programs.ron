@@ -1,0 +1,243 @@
+// Programs catalog — Cyberpunk RED non-Black-ICE NET Programs.
+// Source: rulebook pp.202–204.
+//
+// Black ICE programs (pp.205–207) are catalogued separately by WP-209;
+// they use 2 deck slots and gain PER/SPD stats, neither of which fits
+// this schema.
+//
+// Schema: every entry has
+//   slug: string             // catalog lookup key (also Program::id)
+//   display_name: string     // book display name (preserves punctuation)
+//   class: ProgramClass      // Booster | Defender | AntiPersonnelAttacker | AntiProgramAttacker
+//   atk: u8                  // pp.202–204 ATK column
+//   def: u8                  // pp.202–204 DEF column
+//   rez: u8                  // pp.202–204 REZ column (0 for Attackers)
+//   effect: ProgramEffect    // distilled from the per-program Effect text
+//   icon: string             // pp.203–204 Icon row, verbatim
+//   price: PriceTier         // printed Price Category
+//   price_eb: Eurobucks      // printed eb cost (matches PriceTier::canonical_cost for these)
+//   slot_cost: u8            // 1 for every non-Black-ICE program
+ProgramsFile(
+    programs: [
+        // -- Boosters (p.203) --
+        (
+            slug: "eraser",
+            display_name: "Eraser",
+            class: Booster,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: BoostCheck(check: Cloak, by: 2),
+            icon: "A pink glob exuding tiny soap bubbles.",
+            price: Everyday,
+            price_eb: (20),
+            slot_cost: 1,
+        ),
+        (
+            slug: "see_ya",
+            display_name: "See Ya",
+            class: Booster,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: BoostCheck(check: Pathfinder, by: 2),
+            icon: "Shimmering silver magnifying glass spinning slowly in place.",
+            price: Everyday,
+            price_eb: (20),
+            slot_cost: 1,
+        ),
+        (
+            slug: "speedy_gonzalvez",
+            display_name: "Speedy Gonzalvez",
+            class: Booster,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: BoostCheck(check: Speed, by: 2),
+            icon: "A trail of dust appearing behind the Netrunner as they move.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "worm",
+            display_name: "Worm",
+            class: Booster,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: BoostCheck(check: Backdoor, by: 2),
+            icon: "A golden mechanical worm with neon green eyes.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+
+        // -- Defenders (p.203) --
+        (
+            slug: "armor",
+            display_name: "Armor",
+            class: Defender,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: BlockBlackIceDamage(reduction: 4),
+            icon: "Transparent golden armor worn by the Netrunner.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+        (
+            slug: "flak",
+            display_name: "Flak",
+            class: Defender,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: NullifyAttackerAtk,
+            icon: "A cloud of blinding, glowing, multi-colored lights swirling around the Netrunner.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+        (
+            slug: "shield",
+            display_name: "Shield",
+            class: Defender,
+            atk: 0,
+            def: 0,
+            rez: 7,
+            effect: StopFirstNonBlackIceEffect,
+            icon: "Flickering silver energy barrier surrounding the Netrunner.",
+            price: Everyday,
+            price_eb: (20),
+            slot_cost: 1,
+        ),
+
+        // -- Anti-Program Attackers (pp.203–204) --
+        (
+            slug: "banhammer",
+            display_name: "Banhammer",
+            class: AntiProgramAttacker,
+            atk: 1,
+            def: 0,
+            rez: 0,
+            effect: AnyAttackerProgramDamage(
+                dice_vs_non_black_ice: (n: 3, die: D6),
+                dice_vs_black_ice: (n: 2, die: D6),
+            ),
+            icon: "A giant glowing white sledgehammer wielded by the Netrunner.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+        (
+            slug: "sword",
+            display_name: "Sword",
+            class: AntiProgramAttacker,
+            atk: 1,
+            def: 0,
+            rez: 0,
+            effect: AnyAttackerProgramDamage(
+                dice_vs_non_black_ice: (n: 2, die: D6),
+                dice_vs_black_ice: (n: 3, die: D6),
+            ),
+            icon: "Glowing energy katana appearing from the Netrunner's hand.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+
+        // -- Anti-Personnel Attackers (p.204) --
+        (
+            slug: "deckkrash",
+            display_name: "DeckKRASH",
+            class: AntiPersonnelAttacker,
+            atk: 0,
+            def: 0,
+            rez: 0,
+            effect: ForceUnsafeJackOut,
+            icon: "Cartoon stick of dynamite thrown by the Netrunner.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "hellbolt",
+            display_name: "Hellbolt",
+            class: AntiPersonnelAttacker,
+            atk: 2,
+            def: 0,
+            rez: 0,
+            effect: BrainDamageWithBurn(
+                dice: (n: 2, die: D6),
+                burn_per_turn: 2,
+            ),
+            icon: "Bolt of crimson fire launched from the Netrunner's hand.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "nervescrub",
+            display_name: "Nervescrub",
+            class: AntiPersonnelAttacker,
+            atk: 0,
+            def: 0,
+            rez: 0,
+            effect: NervescrubStatDrain(
+                dice: (n: 1, die: D6),
+                minimum: 1,
+                duration_minutes: 60,
+            ),
+            icon: "Chrome ball thrown by the Netrunner that sparks with electricity.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "poison_flatline",
+            display_name: "Poison Flatline",
+            class: AntiPersonnelAttacker,
+            atk: 0,
+            def: 0,
+            rez: 0,
+            effect: DestroyRandomInstalledProgram,
+            icon: "Beam of neon green light shot from the Netrunner's finger.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "superglue",
+            display_name: "Superglue",
+            class: AntiPersonnelAttacker,
+            atk: 2,
+            def: 0,
+            rez: 0,
+            effect: BlockJackOutAndProgress(
+                dice: (n: 1, die: D6),
+            ),
+            icon: "A mass of sticky red goop fired from the Netrunner's hand.",
+            price: Premium,
+            price_eb: (100),
+            slot_cost: 1,
+        ),
+        (
+            slug: "vrizzbolt",
+            display_name: "Vrizzbolt",
+            class: AntiPersonnelAttacker,
+            atk: 1,
+            def: 0,
+            rez: 0,
+            effect: BrainDamageAndNetActionPenalty(
+                dice: (n: 1, die: D6),
+                action_penalty: 1,
+            ),
+            icon: "A double helix comprised of flickering neon light appearing from the Netrunner's finger.",
+            price: Costly,
+            price_eb: (50),
+            slot_cost: 1,
+        ),
+    ]
+)
