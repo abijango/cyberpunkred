@@ -21,6 +21,7 @@
 //!
 //! [`Resolution`]: crate::resolution::Resolution
 
+pub mod backdoor;
 pub mod cloak;
 pub mod eye_dee;
 pub mod scanner;
