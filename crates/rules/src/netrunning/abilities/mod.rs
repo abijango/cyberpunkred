@@ -21,4 +21,5 @@
 //!
 //! [`Resolution`]: crate::resolution::Resolution
 
+pub mod cloak;
 pub mod scanner;

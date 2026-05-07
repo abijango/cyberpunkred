@@ -32,6 +32,21 @@ pub enum RulesError {
     /// PC nor any on-scene NPC. Raised by check / attack resolutions
     /// when the actor (or defender) cannot be found.
     EntityNotFound(EntityId),
+    /// A NET Action was attempted but there is no active `NetrunState` in
+    /// `world.netrun`. This indicates the Netrunner is not jacked in.
+    ///
+    /// See p.198 (Jack In/Out) — only jacked-in Netrunners can use Interface
+    /// Abilities.
+    NoActiveNetrun,
+    /// A NET Action was attempted but the Netrunner has already exhausted
+    /// their NET Action budget for this turn.
+    ///
+    /// The number of NET Actions per turn is determined by Interface rank
+    /// (p.197). `net_actions_used_this_turn >= net_actions_max_this_turn`
+    /// triggers this error; state is left unchanged.
+    ///
+    /// See p.197 (NET Actions table).
+    NoNetActionsRemaining,
     /// A Phase 2 catalog loader (skills, weapons, armor, …) failed to
     /// read or parse its on-disk RON file, or rejected the file's
     /// contents on a domain-level invariant (duplicate slug,
@@ -59,6 +74,12 @@ impl fmt::Display for RulesError {
             ),
             RulesError::EntityNotFound(id) => {
                 write!(f, "entity not found in world: {:?}", id.0)
+            }
+            RulesError::NoActiveNetrun => {
+                write!(f, "no active netrun: Netrunner is not jacked in")
+            }
+            RulesError::NoNetActionsRemaining => {
+                write!(f, "no NET Actions remaining for this turn")
             }
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
