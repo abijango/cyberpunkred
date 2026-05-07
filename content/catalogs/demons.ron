@@ -1,0 +1,47 @@
+// Demons catalog — Cyberpunk RED rulebook p.212 (Demons table).
+//
+// Demons are large-scale Black ICE Intelligent Systems that defend a NET
+// Architecture. They cannot run Programs or Black ICE; they exist to
+// operate Control Nodes (drones, turrets, …) and defend the architecture
+// against Netrunner intruders. Per p.212, Demons have only two NET
+// Actions available — Zap (defend) and Control (operate Control Nodes).
+//
+// Schema: every entry has
+//   slug: string                 // catalog lookup key
+//   display_name: string         // book display name (p.212)
+//   rez: u16                     // REZ score (p.212)
+//   interface: u8                // Interface ability rank (p.212)
+//   net_actions_per_turn: u8     // NET Actions per Turn (p.212)
+//   combat_number: u8            // Combat Number (p.212)
+//   icon: string                 // icon flavour callout, verbatim (p.212)
+DemonsFile(
+    demons: [
+        (
+            slug: "imp",
+            display_name: "Imp",
+            rez: 15,
+            interface: 3,
+            net_actions_per_turn: 2,
+            combat_number: 14,
+            icon: "Small orange sphere of light with red horns.",
+        ),
+        (
+            slug: "efreet",
+            display_name: "Efreet",
+            rez: 25,
+            interface: 4,
+            net_actions_per_turn: 3,
+            combat_number: 14,
+            icon: "Tall, powerfully built Black man, dressed in elegant evening clothes completed with a fez and dagger.",
+        ),
+        (
+            slug: "balron",
+            display_name: "Balron",
+            rez: 30,
+            interface: 7,
+            net_actions_per_turn: 4,
+            combat_number: 14,
+            icon: "Huge humanoid monster in futuristic black arm or covered with hissing green glowing tentacles.",
+        ),
+    ],
+)
