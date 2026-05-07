@@ -8,6 +8,7 @@
 pub mod catalog;
 pub mod character;
 pub mod checks;
+pub mod combat;
 pub mod dice;
 pub mod effects;
 pub mod error;
