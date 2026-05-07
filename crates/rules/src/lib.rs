@@ -22,6 +22,10 @@ pub use catalog::skills::{
     Instrument, LanguageKind, LocalArea, MartialArtsForm, ScienceField, SkillCategory,
     SkillDefinition, SkillId,
 };
+pub use catalog::weapons::{
+    load_weapons_catalog, DamageDice, DieKind, Magazine, MeleeKind, RangeBand, RangedKind, Weapon,
+    WeaponFeature, WeaponKind,
+};
 pub use catalog::Catalog;
 pub use error::RulesError;
 pub use rng::Rng;

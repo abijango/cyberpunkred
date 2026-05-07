@@ -4,12 +4,15 @@
 //! no validation hooks. Validation belongs to the GM layer / progression
 //! actions; query-time derivation belongs to a later WP.
 //!
-//! Several catalog-shaped types (`Lifepath`, `WeaponId`) are placeholders
-//! following WP-003's precedent — string-newtype or `Placeholder(String)`
-//! shells that compile today and will be replaced by closed enums once
-//! the catalog WPs land. `ArmorKind` was one such placeholder; WP-203
-//! has since replaced it with the closed enum re-exported from
-//! [`crate::catalog::armor`].
+//! `Lifepath` is a placeholder following WP-003's precedent — a stub that
+//! compiles today and will be replaced by a closed structure once WP-214
+//! lands. `ArmorKind` was one such placeholder; WP-203 has since replaced
+//! it with the closed enum re-exported from [`crate::catalog::armor`].
+//!
+//! [`WeaponId`] is **not** a placeholder: WP-202 keeps it as a string
+//! newtype on purpose because the weapon catalog is open-ended (brand
+//! variants, exotic weapons of GM's choice — see pp.342, 347), so the
+//! lookup key has to stay a free-form slug into the catalog RON.
 
 pub use crate::catalog::armor::ArmorKind;
 use crate::effects::{CyberwareId, SkillId, WoundState};
@@ -182,32 +185,54 @@ pub enum ItemKind {
     Misc(String),
 }
 
-/// Weapon catalog slug.
+/// Weapon catalog slug — the lookup key into the weapon catalog
+/// (WP-202, `crates/rules/src/catalog/weapons.rs`).
 ///
-/// **Stub.** WP-207 will replace this with a full weapon catalog entry.
+/// Unlike [`crate::catalog::SkillId`], which is a closed enum, `WeaponId`
+/// stays a string newtype on purpose: the catalog is open-ended (brand
+/// variants per p.342, exotic weapons of the GM's choice per p.347, future
+/// DLC additions). The slug is the canonical handle — the loader enforces
+/// uniqueness and the `Catalog<Weapon>` lookup converts a `WeaponId` back
+/// into the full [`crate::catalog::weapons::Weapon`].
+///
 /// `Hash` is included so downstream code can key sets / maps on weapons.
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub struct WeaponId(pub String);
 
-/// Ammunition kind. See p.344.
+/// Ammunition kind. See p.344 (Ammunition section, Night Market appendix).
 ///
-/// The book lists ammunition as Bullet (Medium, Heavy, & Very Heavy
-/// Pistol; Slug; or Rifle), Shotgun Shell, Arrow, Grenade, and Rocket.
-/// This skeleton enum carries the four variants the book names by chamber
-/// type; WP-203 will refine into the full set (Arrow, Grenade, Rocket,
-/// pistol calibers, special-purpose rounds).
+/// Per p.344 RAW: "Ammunition comes in many varieties: Bullet (Medium,
+/// Heavy, & Very Heavy Pistol, Slug, or Rifle), Shotgun Shell, Arrow,
+/// Grenade, and Rocket". The variants here correspond 1:1 to the book's
+/// list, with the bullet sub-types broken out (Medium/Heavy/Very Heavy
+/// Pistol caliber chambers feed different magazines per p.171). Shotgun
+/// shells are encoded by the weapon's `WeaponFeature::ShotgunShell`
+/// alt-fire mode rather than by ammo kind: a shotgun's loaded ammunition
+/// is `Slug` per p.171, and shells are an alt-fire option (p.174).
+///
+/// See [`crate::catalog::weapons::Weapon::magazine`] for how a weapon
+/// references its ammo type.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AmmoKind {
-    /// Pistol rounds — Medium, Heavy, and Very Heavy Pistol chambers, plus
-    /// SMG and Heavy SMG. See p.344.
-    Pistol,
-    /// Rifle rounds — Assault Rifle and Sniper Rifle chambers. See p.344.
-    Rifle,
-    /// Shotgun shells — buckshot or similar. See p.344.
-    Shotgun,
-    /// Slug rounds — explicitly named on p.344 alongside the pistol and
-    /// rifle bullet variants.
+    /// Medium Pistol caliber. Used by Medium Pistol and SMG (p.171).
+    MPistol,
+    /// Heavy Pistol caliber. Used by Heavy Pistol and Heavy SMG (p.171).
+    HPistol,
+    /// Very Heavy Pistol caliber. Used by Very Heavy Pistol (p.171).
+    VHPistol,
+    /// Shotgun slug round — the default ammunition for a Shotgun's
+    /// magazine (p.171). Shotgun shells are loaded as a `ShotgunShell`
+    /// alt-fire feature (p.174).
     Slug,
+    /// Rifle caliber. Used by Assault Rifle and Sniper Rifle (p.171).
+    Rifle,
+    /// Arrow — for Bows and Crossbows (p.171). Per p.174, basic arrows can
+    /// always be retrieved after firing, so a bow "never needs to Reload".
+    Arrow,
+    /// Grenade — Grenade Launcher munition (p.171, p.344). Sold per round.
+    Grenade,
+    /// Rocket — Rocket Launcher munition (p.171, p.344). Sold per round.
+    Rocket,
 }
 
 /// Lifepath record.
