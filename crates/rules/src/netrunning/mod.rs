@@ -15,6 +15,7 @@
 pub mod abilities;
 pub mod actions;
 pub mod architecture;
+pub mod black_ice;
 pub mod demon;
 pub mod integration;
 pub mod programs;
