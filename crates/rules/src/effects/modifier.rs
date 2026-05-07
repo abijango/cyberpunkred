@@ -5,6 +5,7 @@
 //! result becomes a variant here. New variants are added carefully and
 //! reviewed.
 
+use crate::catalog::programs::BoostableCheck;
 use crate::effects::SkillId;
 use crate::types::Stat;
 use serde::{Deserialize, Serialize};
@@ -27,6 +28,9 @@ use serde::{Deserialize, Serialize};
 /// - **Lifecycle-event consumers (combat engine hook points,
 ///   §2.6 reverse-coupling):** `DamageOnMovementOver`, `DamagePerTurn`.
 /// - **Death-save consumers:** `DeathSavePenaltyDelta`.
+/// - **Netrunning consumers (WP-412):** `NetrunCheckBonus`,
+///   `NetrunBrainDamageReduction`, `NetrunAttackerAtkNullified`,
+///   `NetrunFirstEffectBlocked`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EffectModifier {
     /// Reduce the queried value of a stat. e.g. `Drunk` reduces REF by 2.
@@ -74,6 +78,54 @@ pub enum EffectModifier {
     AutofireDvDelta(i8),
     /// Adjust initiative roll. e.g. Sandevistan grants a bonus.
     InitiativeBonus(i8),
+
+    // ---- Netrunning (WP-412) ------------------------------------------------
+    //
+    // These variants are consumed by NET Architecture resolution code that
+    // asks "what Interface-ability or speed bonus does the Netrunner have
+    // active right now?" The consumer iterates `EffectStack::iter_modifiers`
+    // and sums the `by` field for the relevant check. See p.201.
+    /// Boosts one of the four boostable Interface Checks (or NET Speed) while
+    /// a Booster program is Rezzed. Produced by programs with
+    /// `ProgramEffect::BoostCheck` (Eraser, See Ya, Worm, Speedy Gonzalvez).
+    ///
+    /// For `BoostableCheck::Speed`, the consumer should add `by` to the
+    /// Netrunner's derived NET Speed (MOVE-equivalent inside the NET
+    /// Architecture). For the other three variants the consumer adds `by` to
+    /// the relevant Interface-ability check roll.
+    ///
+    /// See p.201, p.203.
+    NetrunCheckBonus {
+        /// Which Interface Ability or derived value is being boosted.
+        check: BoostableCheck,
+        /// Magnitude of the bonus. `+2` for every published Booster (p.203).
+        by: i8,
+    },
+
+    /// Reduces all brain damage received from Black ICE by `reduction` while
+    /// the Armor Defender program is Rezzed. Consumed by the Black ICE combat
+    /// resolution code (WP-414) when it applies brain damage to a Netrunner.
+    ///
+    /// See p.201, p.203: "Armor: Lowers all brain damage you would receive
+    /// by 4."
+    NetrunBrainDamageReduction(u8),
+
+    /// Reduces the ATK bonus of every Non-Black-ICE Attacker Program run
+    /// against the Netrunner to 0 while the Flak Defender program is Rezzed.
+    /// Consumed by Attacker resolution code (WP-413).
+    ///
+    /// See p.201, p.203: "Flak: Reduces the ATK of non-Black-ICE Attacker
+    /// Programs run against you to 0."
+    NetrunAttackerAtkNullified,
+
+    /// Stops the first successful Non-Black-ICE Program Effect from dealing
+    /// brain damage; the program then auto-Derezzes. Set by Shield (Defender).
+    /// Consumed by Attacker resolution code (WP-413) which must check for this
+    /// modifier before applying brain damage and then derez Shield.
+    ///
+    /// See p.201, p.203: "Shield: Stops the first successful Non-Black ICE
+    /// Program Effect from dealing brain damage."
+    NetrunFirstEffectBlocked,
 }
 
 /// Which hand an action uses. See `EffectModifier::HandActionsPenalty`.

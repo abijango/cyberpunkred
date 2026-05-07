@@ -6,6 +6,7 @@
 //! pattern-match on the variant; the [`std::fmt::Display`] impl produces
 //! a human-readable message for logs / UI.
 
+use crate::effects::ProgramId;
 use crate::types::EntityId;
 use std::fmt;
 use std::path::PathBuf;
@@ -67,6 +68,31 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
+
+    /// A program activation was attempted with an unknown catalog slug.
+    ///
+    /// Raised by [`crate::netrunning::programs::active::activate_booster_or_defender`]
+    /// when the slug in [`crate::netrunning::programs::active::ActivateProgram::program`]
+    /// does not appear in the provided [`crate::catalog::Catalog<Program>`].
+    ///
+    /// See p.201.
+    ProgramNotFound(ProgramId),
+
+    /// A program activation was attempted with the wrong program class.
+    ///
+    /// [`crate::netrunning::programs::active::activate_booster_or_defender`]
+    /// only handles `Booster` and `Defender` programs. Attacker programs are
+    /// handled by WP-413. Supplying an Attacker slug returns this error.
+    ///
+    /// See p.201.
+    ProgramWrongClass {
+        /// The program slug that was supplied.
+        program: ProgramId,
+        /// What class was expected (human-readable).
+        expected: &'static str,
+        /// What class the program actually has (human-readable).
+        got: String,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -94,6 +120,18 @@ impl fmt::Display for RulesError {
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
             }
+            RulesError::ProgramNotFound(id) => {
+                write!(f, "program not found in catalog: '{}'", id.0)
+            }
+            RulesError::ProgramWrongClass {
+                program,
+                expected,
+                got,
+            } => write!(
+                f,
+                "program '{}' has wrong class: expected {expected}, got {got}",
+                program.0
+            ),
         }
     }
 }
