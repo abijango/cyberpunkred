@@ -12,6 +12,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub mod demons;
 pub mod skills;
 
 /// A read-only collection of catalog entries keyed by string slug.
