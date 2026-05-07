@@ -22,3 +22,4 @@
 //! [`Resolution`]: crate::resolution::Resolution
 
 pub mod scanner;
+pub mod zap;
