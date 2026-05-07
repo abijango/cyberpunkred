@@ -6,6 +6,8 @@
 //!
 //! ## Sub-modules
 //!
+//! - [`autofire`] (WP-309) — Autofire resolution: REF + Autofire + d10 vs
+//!   autofire DV table; 2d6 × min(margin, cap) damage; both 6s trigger crit.
 //! - [`cover`] (WP-313) — cover interposition; absorb / pass-through split.
 //! - [`critical_injury`] (WP-305) — critical-injury trigger and application.
 //! - [`damage`] (WP-303) — damage pipeline and armor ablation.
@@ -16,6 +18,7 @@
 //! - [`suppressive`] (WP-310) — suppressive fire: 10 bullets, WILL+Concentration check.
 //! - [`turn_engine`] (WP-301) — initiative rolling, queue management, round lifecycle.
 
+pub mod autofire;
 pub mod cover;
 pub mod critical_injury;
 pub mod damage;

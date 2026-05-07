@@ -6,6 +6,7 @@
 //! pattern-match on the variant; the [`std::fmt::Display`] impl produces
 //! a human-readable message for logs / UI.
 
+use crate::character::WeaponId;
 use crate::effects::ProgramId;
 use crate::types::EntityId;
 use std::fmt;
@@ -68,21 +69,11 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
-
     /// A program activation was attempted with an unknown catalog slug.
-    ///
-    /// Raised by [`crate::netrunning::programs::active::activate_booster_or_defender`]
-    /// when the slug in [`crate::netrunning::programs::active::ActivateProgram::program`]
-    /// does not appear in the provided [`crate::catalog::Catalog<Program>`].
     ///
     /// See p.201.
     ProgramNotFound(ProgramId),
-
     /// A program activation was attempted with the wrong program class.
-    ///
-    /// [`crate::netrunning::programs::active::activate_booster_or_defender`]
-    /// only handles `Booster` and `Defender` programs. Attacker programs are
-    /// handled by WP-413. Supplying an Attacker slug returns this error.
     ///
     /// See p.201.
     ProgramWrongClass {
@@ -93,6 +84,21 @@ pub enum RulesError {
         /// What class the program actually has (human-readable).
         got: String,
     },
+    /// A weapon catalog lookup failed — the [`WeaponId`] slug is not
+    /// present in the supplied catalog. Added for WP-309 (Autofire).
+    WeaponNotFound(WeaponId),
+    /// The specified weapon does not support the requested fire mode. See p.173.
+    WeaponLacksAutofire(WeaponId),
+    /// The attacker's magazine does not have enough rounds for the
+    /// requested action. See p.173.
+    InsufficientAmmo {
+        /// Rounds requested.
+        required: u8,
+        /// Rounds actually available in the magazine.
+        available: u8,
+    },
+    /// The weapon is out of autofire range. See p.173.
+    OutOfAutofireRange,
 }
 
 impl fmt::Display for RulesError {
@@ -132,6 +138,29 @@ impl fmt::Display for RulesError {
                 "program '{}' has wrong class: expected {expected}, got {got}",
                 program.0
             ),
+            RulesError::WeaponNotFound(id) => {
+                write!(f, "weapon not found in catalog: {:?}", id.0)
+            }
+            RulesError::WeaponLacksAutofire(id) => {
+                write!(
+                    f,
+                    "weapon '{:?}' does not support Autofire (see p.173)",
+                    id.0
+                )
+            }
+            RulesError::InsufficientAmmo {
+                required,
+                available,
+            } => write!(
+                f,
+                "insufficient ammo: required {required} rounds, only {available} in magazine"
+            ),
+            RulesError::OutOfAutofireRange => {
+                write!(
+                    f,
+                    "target is out of autofire range (max 100 m/yd per p.173)"
+                )
+            }
         }
     }
 }
