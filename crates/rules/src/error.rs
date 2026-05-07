@@ -6,6 +6,7 @@
 //! pattern-match on the variant; the [`std::fmt::Display`] impl produces
 //! a human-readable message for logs / UI.
 
+use crate::character::WeaponId;
 use crate::effects::ProgramId;
 use crate::types::EntityId;
 use std::fmt;
@@ -79,11 +80,6 @@ pub enum RulesError {
     ProgramNotFound(ProgramId),
 
     /// A program activation was attempted with the wrong program class.
-    ///
-    /// [`crate::netrunning::programs::active::activate_booster_or_defender`]
-    /// only handles `Booster` and `Defender` programs. Attacker programs are
-    /// handled by WP-413. Supplying an Attacker slug returns this error.
-    ///
     /// See p.201.
     ProgramWrongClass {
         /// The program slug that was supplied.
@@ -92,6 +88,59 @@ pub enum RulesError {
         expected: &'static str,
         /// What class the program actually has (human-readable).
         got: String,
+    },
+    /// Alias used by some Phase 4 W3 modules for `ProgramWrongClass`.
+    /// See p.201.
+    WrongProgramClass {
+        /// The program slug.
+        program: ProgramId,
+        /// Human-readable expected class.
+        expected: &'static str,
+        /// Human-readable actual class.
+        got: String,
+        /// Same as `got`; kept for legacy callers.
+        found: String,
+    },
+    /// A weapon catalog lookup failed (WP-309). See p.171.
+    WeaponNotFound(WeaponId),
+    /// The weapon does not support Autofire (WP-309). See p.173.
+    WeaponLacksAutofire(WeaponId),
+    /// The attacker's magazine does not have enough rounds (WP-309). See p.173.
+    InsufficientAmmo {
+        /// Rounds requested.
+        required: u8,
+        /// Rounds actually available in the magazine.
+        available: u8,
+    },
+    /// The weapon is out of autofire range (WP-309). See p.173.
+    OutOfAutofireRange,
+    /// Defender attempted a Ranged Dodge with REF < 8 (WP-306). See p.172.
+    DodgeNotEligible {
+        /// Defender's current REF (after armor penalties).
+        current_ref: i16,
+    },
+    /// Alias for `NoActiveNetrun` used by some WP-407/WP-413/WP-416 modules.
+    NetrunNotActive,
+    /// The target floor for Control is not a Control Node (WP-407). See p.199.
+    NotAControlNode {
+        /// Floor index that was targeted.
+        floor_idx: usize,
+    },
+    /// Slide already used this turn (WP-410). See p.200.
+    SlideAlreadyUsedThisTurn,
+    /// Slide target is not a Black ICE floor (WP-410). See p.200.
+    SlideTargetNotBlackIce {
+        /// Floor index that was targeted.
+        floor_idx: usize,
+    },
+    /// Slide cannot target a Demon (WP-410). See p.200, p.212.
+    CannotSlideDemon,
+    /// Virus deployment requires being on the bottom floor (WP-416). See p.200.
+    NotOnBottomFloor {
+        /// Netrunner's current floor index.
+        current_floor: usize,
+        /// Index of the architecture's bottom floor.
+        bottom_floor: usize,
     },
 }
 
@@ -131,6 +180,60 @@ impl fmt::Display for RulesError {
                 f,
                 "program '{}' has wrong class: expected {expected}, got {got}",
                 program.0
+            ),
+            RulesError::WrongProgramClass {
+                program,
+                expected,
+                got,
+                ..
+            } => write!(
+                f,
+                "program '{}' has wrong class: expected {expected}, got {got}",
+                program.0
+            ),
+            RulesError::WeaponNotFound(id) => {
+                write!(f, "weapon not found in catalog: {:?}", id.0)
+            }
+            RulesError::WeaponLacksAutofire(id) => {
+                write!(f, "weapon '{:?}' does not support Autofire (p.173)", id.0)
+            }
+            RulesError::InsufficientAmmo {
+                required,
+                available,
+            } => write!(
+                f,
+                "insufficient ammo: required {required} rounds, only {available} in magazine"
+            ),
+            RulesError::OutOfAutofireRange => {
+                write!(f, "target is out of autofire range (max 100m, p.173)")
+            }
+            RulesError::DodgeNotEligible { current_ref } => {
+                write!(
+                    f,
+                    "dodge not eligible: current REF {current_ref} < 8 (p.172)"
+                )
+            }
+            RulesError::NetrunNotActive => {
+                write!(f, "netrun not active: jack in first")
+            }
+            RulesError::NotAControlNode { floor_idx } => {
+                write!(f, "floor {floor_idx} is not a Control Node (p.199)")
+            }
+            RulesError::SlideAlreadyUsedThisTurn => {
+                write!(f, "Slide already used this turn (p.200)")
+            }
+            RulesError::SlideTargetNotBlackIce { floor_idx } => {
+                write!(f, "floor {floor_idx} is not a Black ICE (p.200)")
+            }
+            RulesError::CannotSlideDemon => {
+                write!(f, "cannot Slide a Demon (p.212)")
+            }
+            RulesError::NotOnBottomFloor {
+                current_floor,
+                bottom_floor,
+            } => write!(
+                f,
+                "not on the bottom floor: at {current_floor}, bottom is {bottom_floor} (p.200)"
             ),
         }
     }

@@ -23,6 +23,9 @@
 
 pub mod backdoor;
 pub mod cloak;
+pub mod control;
 pub mod eye_dee;
+pub mod pathfinder;
 pub mod scanner;
+pub mod slide;
 pub mod zap;

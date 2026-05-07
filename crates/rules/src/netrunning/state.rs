@@ -188,9 +188,9 @@ pub enum VirusEffect {
 /// | 7–9            | 4           |
 /// | 10             | 5           |
 ///
-/// [`super::actions::net_actions_per_turn`] is the single source of truth
-/// for this mapping (WP-403). This state struct embeds the computed value
-/// directly so each action site does not need to recompute it.
+/// WP-403 will expose a standalone `net_actions_per_turn(rank)` function;
+/// this state struct embeds the computed value directly so each action
+/// site does not need to recompute it.
 ///
 /// See pp.197–200 (NET Actions, Interface Abilities), p.198 (Jack In/Out).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -251,6 +251,30 @@ pub struct NetrunState {
     /// [`rez_program`] only.
     #[serde(default)]
     program_id_counter: u64,
+
+    /// `true` if the Slide Interface Ability has already been used this turn.
+    ///
+    /// Per p.200: "You can only attempt to Slide once per Turn." Reset to
+    /// `false` by [`reset_turn`].
+    ///
+    /// See p.200 (Slide Interface Ability).
+    #[serde(default)]
+    pub slide_used_this_turn: bool,
+
+    /// The live floor list for this netrun.
+    ///
+    /// Floors are 0-indexed from the top (Lobby). This list is owned by
+    /// `NetrunState` so that Interface Ability resolvers (Slide, Backdoor,
+    /// etc.) can mutate floor state (e.g. setting `BlackIceState::Slid`)
+    /// without requiring a separate architecture registry lookup.
+    ///
+    /// Populated by `NetrunState::start_with_floors` (WP-410) or by the
+    /// caller directly. Defaults to an empty vec so that existing
+    /// `NetrunState::start` call sites stay valid.
+    ///
+    /// See pp.209–211 (Floor types), p.200 (Slide mutates BlackIceState).
+    #[serde(default)]
+    pub floors: Vec<crate::netrunning::architecture::Floor>,
 }
 
 impl NetrunState {
@@ -282,6 +306,8 @@ impl NetrunState {
             net_actions_used_this_turn: 0,
             net_actions_max_this_turn: net_actions_per_turn(interface_rank),
             program_id_counter: 0,
+            slide_used_this_turn: false,
+            floors: Vec::new(),
         }
     }
 
@@ -394,10 +420,11 @@ impl NetrunState {
 
     /// Reset NET Action accounting for a new turn.
     ///
-    /// Sets `net_actions_used_this_turn` to 0 and recomputes
-    /// `net_actions_max_this_turn` from `interface_rank`. Recomputing on
-    /// each turn reset allows the max to change mid-netrun (e.g. if a Virus
-    /// reduces the Netrunner's NET Actions via Vrizzbolt's effect, p.204).
+    /// Sets `net_actions_used_this_turn` to 0, resets `slide_used_this_turn`
+    /// to `false`, and recomputes `net_actions_max_this_turn` from
+    /// `interface_rank`. Recomputing on each turn reset allows the max to
+    /// change mid-netrun (e.g. if a Virus reduces the Netrunner's NET Actions
+    /// via Vrizzbolt's effect, p.204).
     ///
     /// The `interface_rank → net_actions_max` mapping per p.197:
     ///
@@ -408,13 +435,35 @@ impl NetrunState {
     /// | 7–9            | 4           |
     /// | 10             | 5           |
     ///
-    /// Delegates to [`super::actions::net_actions_per_turn`] (WP-403) to
-    /// avoid duplication.
+    /// WP-403 will expose this as a standalone public function
+    /// `net_actions_per_turn(rank)` to avoid duplication. This call site will
+    /// delegate to it once WP-403 lands.
     ///
-    /// See p.197 (NET Actions table), p.198 (each Turn).
+    /// See p.197 (NET Actions table), p.198 (each Turn), p.200 (Slide
+    /// once-per-Turn reset).
     pub fn reset_turn(&mut self, interface_rank: u8) {
         self.net_actions_used_this_turn = 0;
         self.net_actions_max_this_turn = net_actions_per_turn(interface_rank);
+        self.slide_used_this_turn = false;
+    }
+
+    /// Return the `ice_per` (Perception stat) for a `Floor::BlackIce` at
+    /// `floor_idx`, or `None` if the floor does not exist or is not a
+    /// `Floor::BlackIce`.
+    ///
+    /// Used by [`crate::netrunning::abilities::slide::SlideAction`] to
+    /// access the ICE's PER stat for the contested Slide roll without
+    /// requiring a live `Catalog<BlackIce>` lookup.
+    ///
+    /// See p.200 (Slide: "roll against the Program's Perception + 1d10")
+    /// and pp.206–207 (PER column in the Black ICE table).
+    pub fn ice_per_for_floor(&self, floor_idx: usize) -> Option<u8> {
+        match self.floors.get(floor_idx) {
+            Some(crate::netrunning::architecture::Floor::BlackIce { ice_per, .. }) => {
+                Some(*ice_per)
+            }
+            _ => None,
+        }
     }
 }
 
@@ -664,9 +713,6 @@ mod tests {
 
     /// `test_net_actions_per_interface_rank_matches_table`:
     /// Verify rank 1, 4, 7, 10 against the NET Actions table on p.197.
-    ///
-    /// Delegates to `net_actions_per_turn` (WP-403); this test verifies the
-    /// integration from `state.rs` perspective.
     ///
     /// Table (p.197):
     /// | Interface Rank | 1-3 | 4-6 | 7-9 | 10 |

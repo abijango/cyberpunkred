@@ -439,6 +439,7 @@ mod tests {
         let floors_black_ice = vec![Floor::BlackIce {
             template: BlackIceId("hellhound".into()),
             state: BlackIceState::LyingInWait,
+            ice_per: 0,
         }];
 
         let pc = netrunner_pc(6, 4);

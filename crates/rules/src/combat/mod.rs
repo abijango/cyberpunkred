@@ -6,6 +6,7 @@
 //!
 //! ## Sub-modules
 //!
+//! - [`autofire`] (WP-309) — Autofire resolution.
 //! - [`cover`] (WP-313) — cover interposition; absorb / pass-through split.
 //! - [`critical_injury`] (WP-305) — critical-injury trigger and application.
 //! - [`damage`] (WP-303) — damage pipeline and armor ablation.
@@ -13,9 +14,11 @@
 //! - [`explosives`] (WP-312) — grenade/rocket AoE resolution. See p.174.
 //! - [`grid`] (WP-302 placeholder) — 2D combat grid; replaced by WP-302.
 //! - [`melee`] (WP-307) — melee attack resolution (DEX + skill vs. defender).
+//! - [`ranged_single`] (WP-306) — single-shot ranged attack resolution.
 //! - [`suppressive`] (WP-310) — suppressive fire: 10 bullets, WILL+Concentration check.
 //! - [`turn_engine`] (WP-301) — initiative rolling, queue management, round lifecycle.
 
+pub mod autofire;
 pub mod cover;
 pub mod critical_injury;
 pub mod damage;
@@ -23,6 +26,7 @@ pub mod dodge;
 pub mod explosives;
 pub mod grid;
 pub mod melee;
+pub mod ranged_single;
 pub mod suppressive;
 pub mod turn_engine;
 

@@ -302,6 +302,7 @@ mod tests {
         Floor::BlackIce {
             template: BlackIceId("hellhound".into()),
             state: BlackIceState::LyingInWait,
+            ice_per: 0,
         }
     }
 
