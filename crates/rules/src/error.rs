@@ -60,6 +60,17 @@ pub enum RulesError {
         /// invariant violation).
         source: String,
     },
+    /// The defender attempted to elect a dodge against a ranged attack
+    /// (WP-306 / p.172), but their current REF is below the required
+    /// threshold of 8. Per rulebook p.172: "A Defender with a REF 8 or
+    /// higher can choose to attempt to dodge a Ranged Attack."
+    ///
+    /// The character's current REF (after all active
+    /// [`crate::effects::EffectModifier`]s) is included for diagnostics.
+    DodgeNotEligible {
+        /// The defender's current REF at the time of the check.
+        current_ref: i16,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -83,6 +94,12 @@ impl fmt::Display for RulesError {
             }
             RulesError::CatalogLoadFailed { path, source } => {
                 write!(f, "catalog load failed for {}: {source}", path.display())
+            }
+            RulesError::DodgeNotEligible { current_ref } => {
+                write!(
+                    f,
+                    "defender cannot elect to dodge: current REF {current_ref} < 8 (p.172)"
+                )
             }
         }
     }

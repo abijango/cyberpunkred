@@ -12,6 +12,7 @@
 //! - [`dodge`] (WP-316) — REF≥8 dodge election helper.
 //! - [`explosives`] (WP-312) — grenade/rocket AoE resolution. See p.174.
 //! - [`grid`] (WP-302 placeholder) — 2D combat grid; replaced by WP-302.
+//! - [`ranged_single`] (WP-306) — single-shot ranged attack resolution.
 //! - [`suppressive`] (WP-310) — suppressive fire: 10 bullets, WILL+Concentration check.
 //! - [`turn_engine`] (WP-301) — initiative rolling, queue management, round lifecycle.
 
@@ -21,6 +22,7 @@ pub mod damage;
 pub mod dodge;
 pub mod explosives;
 pub mod grid;
+pub mod ranged_single;
 pub mod suppressive;
 pub mod turn_engine;
 
