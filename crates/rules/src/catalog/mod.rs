@@ -16,6 +16,7 @@ pub mod cover;
 pub mod demons;
 pub mod drugs;
 pub mod skills;
+pub mod vehicles;
 
 /// A read-only collection of catalog entries keyed by string slug.
 ///

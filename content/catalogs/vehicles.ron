@@ -1,0 +1,316 @@
+// Vehicle catalog — Cyberpunk RED.
+//
+// Primary source: rulebook p.190 (the Land/Sea/Air vehicle statblock
+// table). Every numeric stat in this file is taken verbatim from that
+// page unless otherwise noted in a per-entry comment.
+//
+// Secondary source: rulebook pp.322-325 ("How You Get Around") which adds
+// flavour and a small set of named "mega" vehicles (OTEC Hammerhead,
+// Delta 4 Spaceplane, Light Rail Lev Train, CINO RELaCS Cargo Sub, K151
+// AeroZep). Those entries carry an SDP / speed / crew callout but no
+// Cost in the rulebook; their `price_eb` is 0 with `PriceTier::SuperLuxury`,
+// indicating "not on the open consumer market".
+//
+// Schema (see crates/rules/src/catalog/vehicles.rs):
+//   slug: string                // catalog lookup key
+//   id: VehicleId               // matches slug exactly
+//   display_name: string        // book display name
+//   kind: VehicleKind           // Bike / Car / Truck / AV / Boat / Other
+//   seats: u8                   // p.190 "Seats" (per-room entries flattened)
+//   top_speed_kph: u16          // p.190 "Speed (Narrative)" KPH half
+//   hp: u16                     // p.190 "SDP"
+//   sp: u8                      // not published per-vehicle in core; 0
+//   combat_number: u8           // p.190 "Speed (Combat)" MOVE STAT
+//   price: PriceTier            // p.190 listed tier (always Super Luxury)
+//   price_eb: Eurobucks         // p.190 concrete eurobuck cost
+VehiclesFile(
+    vehicles: [
+        // ---------------------------------------------------------------
+        // Land Vehicles (p.190)
+        // ---------------------------------------------------------------
+        (
+            slug: "roadbike",
+            id: VehicleId("roadbike"),
+            display_name: "Roadbike",
+            kind: Bike,
+            seats: 2,
+            top_speed_kph: 161,
+            hp: 35,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(20000),
+        ),
+        (
+            slug: "superbike",
+            id: VehicleId("superbike"),
+            display_name: "Superbike",
+            kind: Bike,
+            seats: 2,
+            top_speed_kph: 483,
+            hp: 35,
+            sp: 0,
+            combat_number: 60,
+            price: SuperLuxury,
+            price_eb: Eurobucks(100000),
+        ),
+        (
+            slug: "compact_groundcar",
+            id: VehicleId("compact_groundcar"),
+            display_name: "Compact Groundcar",
+            kind: Car,
+            seats: 4,
+            top_speed_kph: 161,
+            hp: 50,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(30000),
+        ),
+        (
+            slug: "high_performance_groundcar",
+            id: VehicleId("high_performance_groundcar"),
+            display_name: "High Performance Groundcar",
+            kind: Car,
+            seats: 4,
+            top_speed_kph: 322,
+            hp: 50,
+            sp: 0,
+            combat_number: 40,
+            price: SuperLuxury,
+            price_eb: Eurobucks(50000),
+        ),
+        (
+            slug: "super_groundcar",
+            id: VehicleId("super_groundcar"),
+            display_name: "Super Groundcar",
+            kind: Car,
+            seats: 2,
+            top_speed_kph: 483,
+            hp: 50,
+            sp: 0,
+            combat_number: 60,
+            price: SuperLuxury,
+            price_eb: Eurobucks(100000),
+        ),
+
+        // ---------------------------------------------------------------
+        // Sea Vehicles (p.190)
+        // ---------------------------------------------------------------
+        (
+            slug: "jetski",
+            id: VehicleId("jetski"),
+            display_name: "Jetski",
+            kind: Boat,
+            seats: 2,
+            top_speed_kph: 97,
+            hp: 35,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(20000),
+        ),
+        (
+            slug: "speedboat",
+            id: VehicleId("speedboat"),
+            display_name: "Speedboat",
+            kind: Boat,
+            seats: 4,
+            top_speed_kph: 97,
+            hp: 50,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(30000),
+        ),
+        // Cabin Cruiser: p.190 lists "2 per Room" Seats — flattened to 2.
+        // Cost is "30,000eb (Super Luxury) per room below deck (minimum two
+        // rooms)"; we record the per-room price.
+        (
+            slug: "cabin_cruiser",
+            id: VehicleId("cabin_cruiser"),
+            display_name: "Cabin Cruiser",
+            kind: Boat,
+            seats: 2,
+            top_speed_kph: 24,
+            hp: 60,
+            sp: 0,
+            combat_number: 10,
+            price: SuperLuxury,
+            price_eb: Eurobucks(30000),
+        ),
+        // Yacht: p.190 "4 per Room" Seats flattened to 4. Per-room cost.
+        (
+            slug: "yacht",
+            id: VehicleId("yacht"),
+            display_name: "Yacht",
+            kind: Boat,
+            seats: 4,
+            top_speed_kph: 24,
+            hp: 100,
+            sp: 0,
+            combat_number: 10,
+            price: SuperLuxury,
+            price_eb: Eurobucks(50000),
+        ),
+
+        // ---------------------------------------------------------------
+        // Air Vehicles (p.190)
+        // ---------------------------------------------------------------
+        (
+            slug: "gyrocopter",
+            id: VehicleId("gyrocopter"),
+            display_name: "Gyrocopter",
+            kind: AV,
+            seats: 2,
+            top_speed_kph: 161,
+            hp: 35,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(20000),
+        ),
+        (
+            slug: "helicopter",
+            id: VehicleId("helicopter"),
+            display_name: "Helicopter",
+            kind: AV,
+            seats: 4,
+            top_speed_kph: 322,
+            hp: 60,
+            sp: 0,
+            combat_number: 40,
+            price: SuperLuxury,
+            price_eb: Eurobucks(40000),
+        ),
+        (
+            slug: "av4_multipurpose_aerodyne",
+            id: VehicleId("av4_multipurpose_aerodyne"),
+            display_name: "AV-4 Multipurpose Aerodyne",
+            kind: AV,
+            seats: 6,
+            top_speed_kph: 322,
+            hp: 100,
+            sp: 0,
+            combat_number: 40,
+            price: SuperLuxury,
+            price_eb: Eurobucks(50000),
+        ),
+        (
+            slug: "av9_super_aerodyne",
+            id: VehicleId("av9_super_aerodyne"),
+            display_name: "AV-9 Super Aerodyne",
+            kind: AV,
+            seats: 2,
+            top_speed_kph: 483,
+            hp: 60,
+            sp: 0,
+            combat_number: 60,
+            price: SuperLuxury,
+            price_eb: Eurobucks(100000),
+        ),
+        // Aerozep: p.190 "2 per Room" Seats flattened to 2. Per-room cost.
+        (
+            slug: "aerozep",
+            id: VehicleId("aerozep"),
+            display_name: "Aerozep",
+            kind: AV,
+            seats: 2,
+            top_speed_kph: 161,
+            hp: 100,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(30000),
+        ),
+
+        // ---------------------------------------------------------------
+        // pp.322-325 named extras (no p.190 statblock)
+        //
+        // The rulebook quotes SDP and a single MOVE for these but no
+        // formal Combat / Narrative split and no listed Cost. Where the
+        // book gives a single MOVE we use it as combat_number; where it
+        // gives a single MPH we convert to KPH (mph * 1.609 rounded).
+        // `price_eb` is 0 ("not openly sold"); tier stays SuperLuxury
+        // since these are all elite-tier hardware.
+        // ---------------------------------------------------------------
+        // OTEC Hammerhead Multipurpose Minisub (p.323): Top Surface 15
+        // MPH (10 MOVE), Top Submerged 60 MPH (20 MOVE), SDP 100, Crew 3-8.
+        // We record the submerged top speed (60 MPH = 97 KPH) and the
+        // submerged combat MOVE 20; lower-bound crew for `seats`.
+        (
+            slug: "otec_hammerhead_minisub",
+            id: VehicleId("otec_hammerhead_minisub"),
+            display_name: "OTEC Hammerhead Multipurpose Minisub",
+            kind: Other,
+            seats: 3,
+            top_speed_kph: 97,
+            hp: 100,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(0),
+        ),
+        // Delta 4 Spaceplane (p.324): Top Airspeed Mach 6, SDP 40, Crew 1-2.
+        // Mach 6 ≈ 7350 KPH at sea level. No combat MOVE published.
+        (
+            slug: "delta4_spaceplane",
+            id: VehicleId("delta4_spaceplane"),
+            display_name: "Delta 4 Spaceplane",
+            kind: Other,
+            seats: 1,
+            top_speed_kph: 7350,
+            hp: 40,
+            sp: 0,
+            combat_number: 0,
+            price: SuperLuxury,
+            price_eb: Eurobucks(0),
+        ),
+        // Light Rail Lev Train (p.325): Top Groundspeed 300 MPH (60 MOVE),
+        // SDP 100 per train car. Crew not specified — `seats` = 0.
+        (
+            slug: "light_rail_lev_train",
+            id: VehicleId("light_rail_lev_train"),
+            display_name: "Light Rail Lev Train",
+            kind: Other,
+            seats: 0,
+            top_speed_kph: 483,
+            hp: 100,
+            sp: 0,
+            combat_number: 60,
+            price: SuperLuxury,
+            price_eb: Eurobucks(0),
+        ),
+        // CINO RELaCS Cargo Sub (p.325): Top Surface 15 MPH (10 MOVE),
+        // Top Submerged 60 MPH (20 MOVE), SDP 300, Crew 6-36. Same
+        // submerged-figure convention as the Hammerhead above.
+        (
+            slug: "cino_relacs_cargo_sub",
+            id: VehicleId("cino_relacs_cargo_sub"),
+            display_name: "CINO RELaCS Cargo Sub",
+            kind: Other,
+            seats: 6,
+            top_speed_kph: 97,
+            hp: 300,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(0),
+        ),
+        // K151 AeroZep (p.325): Top Airspeed 100 MPH (20 MOVE), SDP 300,
+        // Crew 2-36. Cargo-class blimp; lower-bound crew for `seats`.
+        (
+            slug: "k151_aerozep",
+            id: VehicleId("k151_aerozep"),
+            display_name: "K151 AeroZep",
+            kind: Other,
+            seats: 2,
+            top_speed_kph: 161,
+            hp: 300,
+            sp: 0,
+            combat_number: 20,
+            price: SuperLuxury,
+            price_eb: Eurobucks(0),
+        ),
+    ],
+)
