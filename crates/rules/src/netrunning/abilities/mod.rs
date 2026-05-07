@@ -23,5 +23,6 @@
 
 pub mod cloak;
 pub mod eye_dee;
+pub mod pathfinder;
 pub mod scanner;
 pub mod zap;
