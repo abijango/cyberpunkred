@@ -57,6 +57,7 @@ These were settled in conversation with the user. Implement against them.
 | LLM providers | LM Studio (browser-direct, no backend), Anthropic (backend-only), Bedrock (backend-only). Same `LlmProvider` trait. |
 | Content format | RON — comments, trailing commas, native enum/struct serialisation. |
 | Derived value caching | Recompute on read. No cache. |
+| Sub-agent model | Always `sonnet` when spawning a sub-agent via the Agent tool. Do **not** inherit the orchestrator's model and do **not** use `opus` or `haiku`. Set `model: "sonnet"` explicitly on every Agent call. |
 
 ### 0.3 How to use this document
 

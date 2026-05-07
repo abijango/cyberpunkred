@@ -21,6 +21,10 @@ You are working on a Rust workspace implementing a *Cyberpunk RED* solo CRPG. Th
 - `#![forbid(unsafe_code)]` in `rules` and `gm`. Don't add `unsafe` anywhere.
 - No `tokio::main`, no `thread_rng`, no `std::time::Instant::now()` in `rules` or `gm`.
 
+## Spawning sub-agents
+
+If you delegate work via the Agent tool, **always** set `model: "sonnet"` explicitly. Do not inherit the orchestrator's model and do not use `opus` or `haiku`. This is a fixed project decision (see `IMPLEMENTATION_PLAN.md` §0.2) — apply it to every Agent call you make.
+
 ## Determinism
 
 The single RNG type is `cpr_rules::Rng = rand_chacha::ChaCha20Rng`. Every dice-rolling function takes `rng: &mut Rng` as the last parameter. Tests use explicit seeds. The replay tool reproduces any game from its seed and action log.
