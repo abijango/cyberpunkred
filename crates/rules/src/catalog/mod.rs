@@ -14,6 +14,7 @@ use std::collections::HashMap;
 
 pub mod cover;
 pub mod demons;
+pub mod drugs;
 pub mod skills;
 
 /// A read-only collection of catalog entries keyed by string slug.
