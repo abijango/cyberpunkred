@@ -16,6 +16,7 @@
 //! the [`crate::effects::EffectStack`]; query sites such as the ones below
 //! are the only place modifiers are *applied*.
 
+use crate::catalog::skills::linked_stat;
 use crate::character::Character;
 use crate::effects::{EffectModifier, SkillId};
 use crate::types::Stat;
@@ -177,31 +178,24 @@ impl Character {
     /// Skill base check value = `current_stat(linked_stat) + current_skill(skill)`.
     /// This is the value before adding 1d10 (or any DV modifiers).
     ///
-    /// **Stub limitation, awaiting WP-201.** The skill catalog (which maps
-    /// each [`SkillId`] to its linked [`Stat`]) does not exist yet. Until it
-    /// lands, this method falls back to [`Stat::Int`] for every skill — INT
-    /// is the most common linked stat across the skill list (Education,
-    /// Awareness, Concentration, Conversation, etc., p.130 onward) and is a
-    /// reasonable conservative default. Callers that need a specific link
-    /// today can use [`Self::skill_base_with_stat`].
+    /// The linked stat is looked up via
+    /// [`crate::catalog::skills::linked_stat`], which encodes the pp.81–84
+    /// table. For an explicit-override (e.g. a campaign-specific Skill that
+    /// the GM has linked to a different Stat) use
+    /// [`Self::skill_base_with_stat`].
     ///
-    /// When WP-201 lands the skill catalog, this method must be updated to
-    /// look up the real linked stat. Tracked as a `[WP-201-revision]`
-    /// follow-up.
-    ///
-    /// See p.130 ("When You Don't Have A Skill — STAT only").
+    /// See p.130 ("When You Don't Have A Skill — STAT only") for the
+    /// untrained case.
     pub fn skill_base(&self, skill: &SkillId) -> i16 {
-        self.skill_base_with_stat(skill, Stat::Int)
+        self.skill_base_with_stat(skill, linked_stat(skill))
     }
 
     /// Skill base check value with an explicit linked stat.
     ///
-    /// This helper exists because the skill catalog (WP-201) is not merged
-    /// yet — see [`Self::skill_base`] for the full story. Callers that
-    /// already know the linked stat (e.g. a combat module computing a
-    /// Handgun check, where Handgun is REF-linked) can pass it directly.
-    /// After WP-201 lands, [`Self::skill_base`] will look up the link
-    /// itself and this helper will remain as an explicit-link escape hatch.
+    /// Most callers should use [`Self::skill_base`], which looks up the
+    /// canonical linked Stat via [`crate::catalog::skills::linked_stat`].
+    /// This helper is reserved for cases where the GM has explicitly
+    /// re-linked a Skill (a rare, scenario-specific override).
     pub fn skill_base_with_stat(&self, skill: &SkillId, linked_stat: Stat) -> i16 {
         self.current_stat(linked_stat) + self.current_skill(skill)
     }
@@ -497,13 +491,13 @@ mod tests {
     fn test_current_skill_no_rank_returns_zero() {
         let pc = fresh_pc();
         // fresh_pc has SkillSet::default() — no entries.
-        assert_eq!(pc.current_skill(&SkillId("handgun".into())), 0);
+        assert_eq!(pc.current_skill(&SkillId::Handgun), 0);
     }
 
     #[test]
     fn test_current_skill_with_bonus() {
         let mut pc = fresh_pc();
-        let handgun = SkillId("handgun".into());
+        let handgun = SkillId::Handgun;
         pc.skills.ranks.insert(handgun.clone(), 4);
         push_effect(
             &mut pc,
@@ -522,8 +516,8 @@ mod tests {
         // SkillPenalty for the same skill subtracts; a SkillBonus on a
         // *different* skill must not leak into this query.
         let mut pc = fresh_pc();
-        let stealth = SkillId("stealth".into());
-        let other = SkillId("brawling".into());
+        let stealth = SkillId::Stealth;
+        let other = SkillId::Brawling;
         pc.skills.ranks.insert(stealth.clone(), 3);
         push_effect(
             &mut pc,
@@ -549,25 +543,37 @@ mod tests {
     }
 
     #[test]
-    fn test_skill_base_uses_int_default_until_wp201() {
-        // Stub behavior: skill_base() uses Stat::Int as the linked stat
-        // until WP-201 lands the skill catalog. fresh_pc has INT 5.
+    fn test_skill_base_uses_catalog_linked_stat() {
+        // Post-WP-201: skill_base() looks up the canonical linked Stat
+        // via crate::catalog::skills::linked_stat. Education is INT-linked
+        // (p.83). fresh_pc has INT 5; rank 4 → 5 + 4 = 9.
         let mut pc = fresh_pc();
-        let s = SkillId("education".into());
+        let s = SkillId::Education;
         pc.skills.ranks.insert(s.clone(), 4);
-        // INT 5 + skill 4 = 9.
         assert_eq!(pc.skill_base(&s), 9);
     }
 
     #[test]
-    fn test_skill_base_with_stat_passes_explicit_link() {
-        // The explicit-link helper lets callers compute the right base
-        // before WP-201 supplies the catalog mapping.
+    fn test_skill_base_handgun_uses_ref() {
+        // Regression: post-WP-201, Handgun is REF-linked (p.84) and
+        // skill_base() picks that up automatically — callers no longer
+        // need skill_base_with_stat for the canonical case. fresh_pc has
+        // REF 7; rank 4 → 7 + 4 = 11.
         let mut pc = fresh_pc();
-        let s = SkillId("handgun".into());
+        let s = SkillId::Handgun;
         pc.skills.ranks.insert(s.clone(), 4);
-        // fresh_pc REF = 7. 7 + 4 = 11.
-        assert_eq!(pc.skill_base_with_stat(&s, Stat::Ref), 11);
+        assert_eq!(pc.skill_base(&s), 11);
+    }
+
+    #[test]
+    fn test_skill_base_with_stat_passes_explicit_link() {
+        // skill_base_with_stat is reserved for explicit-override cases.
+        // Verify that an arbitrary override Stat is honoured.
+        let mut pc = fresh_pc();
+        let s = SkillId::Handgun;
+        pc.skills.ranks.insert(s.clone(), 4);
+        // Forced INT-link (override): fresh_pc INT 5 + rank 4 = 9.
+        assert_eq!(pc.skill_base_with_stat(&s, Stat::Int), 9);
     }
 
     #[test]

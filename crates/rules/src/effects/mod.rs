@@ -247,10 +247,14 @@ pub struct ProgramId(pub String);
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub struct RoleAbilityId(pub String);
 
-/// Skill identifier. WP-201 will refine this into a closed enum of all
-/// in-book skills (pp.81–90); for now a string slug to avoid blocking.
-#[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
-pub struct SkillId(pub String);
+/// Skill identifier — see [`crate::catalog::skills::SkillId`].
+///
+/// Re-exported from the skill catalog so existing call sites
+/// (`effects::SkillId`, `crate::effects::modifier::EffectModifier`) keep
+/// compiling against the canonical type without taking a direct dependency
+/// on `crate::catalog`. The catalog WP-201 supplies the real closed-enum
+/// definition; this module owns only the re-export.
+pub use crate::catalog::skills::SkillId;
 
 #[cfg(test)]
 mod tests {

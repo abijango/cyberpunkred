@@ -98,8 +98,8 @@ mod tests {
 
     fn fully_populated() -> Character {
         let mut ranks = HashMap::new();
-        ranks.insert(SkillId("handgun".into()), 4);
-        ranks.insert(SkillId("brawling".into()), 2);
+        ranks.insert(SkillId::Handgun, 4);
+        ranks.insert(SkillId::Brawling, 2);
 
         let mut stack = EffectStack::new();
         stack.add(ActiveEffect {

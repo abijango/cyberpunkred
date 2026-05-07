@@ -389,9 +389,7 @@ mod tests {
         pc.stats.luck = luck;
         pc.luck_pool = luck;
         if skill_rank > 0 {
-            pc.skills
-                .ranks
-                .insert(SkillId("education".into()), skill_rank);
+            pc.skills.ranks.insert(SkillId::Education, skill_rank);
         }
         let eid = EntityId(pc.id.0);
         (pc, eid)
@@ -407,9 +405,7 @@ mod tests {
         npc.stats.luck = luck;
         npc.luck_pool = luck;
         if skill_rank > 0 {
-            npc.skills
-                .ranks
-                .insert(SkillId("education".into()), skill_rank);
+            npc.skills.ranks.insert(SkillId::Education, skill_rank);
         }
         world.npcs.insert(NpcId(id), npc);
         EntityId(id)
@@ -426,7 +422,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::SIMPLE,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -457,7 +453,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -482,7 +478,7 @@ mod tests {
         let (mut pc, actor) = make_pc(8, 8, 6);
         // The helper put the skill rank against `education`; we want it
         // at 8 specifically, so re-set just to be explicit.
-        pc.skills.ranks.insert(SkillId("education".into()), 8);
+        pc.skills.ranks.insert(SkillId::Education, 8);
         let mut world = World::new(pc);
 
         let seed = find_seed_where(|r| d10(r) == 1 && d10(r) == 10);
@@ -491,7 +487,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV(15),
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -526,11 +522,11 @@ mod tests {
         let check = OpposedCheck {
             attacker,
             attacker_stat: Stat::Int,
-            attacker_skill: SkillId("education".into()),
+            attacker_skill: SkillId::Education,
             attacker_luck: 0,
             defender,
             defender_stat: Stat::Int,
-            defender_skill: SkillId("education".into()),
+            defender_skill: SkillId::Education,
             defender_luck: 0,
             additional_attacker_modifiers: vec![],
             additional_defender_modifiers: vec![],
@@ -561,7 +557,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![NamedModifier {
@@ -593,7 +589,10 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("totally_unknown_skill".into()),
+            // Use Tracking — a real but un-trained skill on this PC.
+            // The "untrained skill" path doesn't depend on the variant
+            // (rank lookup misses → 0); pick any unconfigured one.
+            skill: SkillId::Tracking,
             dv: DV::SIMPLE,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -619,7 +618,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 3,
             additional_modifiers: vec![],
@@ -648,7 +647,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 5,
             additional_modifiers: vec![],
@@ -686,7 +685,7 @@ mod tests {
         let check = SkillCheck {
             actor: unknown,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
@@ -719,7 +718,7 @@ mod tests {
         let check = SkillCheck {
             actor,
             stat: Stat::Int,
-            skill: SkillId("education".into()),
+            skill: SkillId::Education,
             dv: DV::EVERYDAY,
             luck_to_spend: 0,
             additional_modifiers: vec![],
