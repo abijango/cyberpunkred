@@ -15,4 +15,5 @@
 pub mod abilities;
 pub mod actions;
 pub mod architecture;
+pub mod demon;
 pub mod state;
