@@ -606,4 +606,274 @@ mod tests {
         assert_eq!(outcome.armor_ablated_to, Some(0));
         assert_eq!(world.pc.armor.body.as_ref().unwrap().current_sp, 0);
     }
+
+    // ---- WP-304 Integration tests — wound-state wiring -----------------------
+    //
+    // These tests verify that WP-303 (`apply_damage`) and WP-106
+    // (`update_wound_state`) are correctly wired together end-to-end:
+    //
+    //   * `apply_damage` correctly captures the prior wound state, delegates
+    //     to `update_wound_state`, and surfaces the transition in
+    //     `DamageOutcome::wound_state_change`.
+    //   * The effect stack carries exactly the right `AllActionsPenalty` and
+    //     `MovePenalty` modifiers for each wound state.
+    //   * Transitions between states remove the old effect and install the new
+    //     one (no leftover modifiers from the prior state).
+    //   * Healing (direct HP write + `update_wound_state`) removes the wound
+    //     effect and restores normal query results.
+    //
+    // Rulebook: p.186 (Wound States table).
+    //
+    // Approach: extend `damage.rs::tests` so that WP-303 and WP-304 tests live
+    // in the same file. The integration tests add no new public API.
+
+    /// Helper: build a PC whose wound bookkeeping matches a given max_hp.
+    ///
+    /// Sets `max_hp`, `seriously_wounded_threshold` (= ceil(max_hp/2)),
+    /// `death_save_base`, and `current_hp` (= max_hp, i.e. full health).
+    /// `current_state` starts at `WoundState::None`. No armor is equipped so
+    /// all `apply_damage` calls land directly on HP.
+    fn pc_with_max_hp_wp304(max_hp: u16, body: u8) -> crate::character::Character {
+        let mut pc = fresh_pc();
+        pc.stats.body = body;
+        pc.wounds.max_hp = max_hp;
+        pc.wounds.seriously_wounded_threshold = max_hp.div_ceil(2);
+        pc.wounds.death_save_base = body;
+        pc.wounds.current_hp = max_hp as i16;
+        pc.wounds.current_state = crate::effects::WoundState::None;
+        pc
+    }
+
+    /// WP-304 acceptance: transitioning from no wound state to Seriously
+    /// Wounded via `apply_damage` installs an `AllActionsPenalty(-2)` effect.
+    ///
+    /// Setup: PC with max_hp 30, threshold 15 (= ceil(30/2)), no armor.
+    /// Action: `apply_damage` with raw_damage = 15 (takes HP from 30 → 15,
+    ///   which is exactly the threshold, so → Seriously Wounded).
+    /// Expected:
+    ///   - `outcome.wound_state_change == Some((WoundState::None, WoundState::Seriously))`
+    ///   - `character.all_actions_penalty() == -2` (Seriously effect installed)
+    ///
+    /// Rulebook: p.186 — "Seriously Wounded: -2 to all Actions."
+    #[test]
+    fn test_seriously_adds_minus_two_effect() {
+        let pc = pc_with_max_hp_wp304(30, 6);
+        let pc_id = pc.id.0;
+        let mut world = World::new(pc);
+
+        // No armor — bypass_armor = false but there is no armor piece, so
+        // sp_blocked = 0 and all 15 damage lands on HP.
+        let dmg = DamageApplication {
+            target: EntityId(pc_id),
+            raw_damage: 15,
+            location: HitLocation::Body,
+            bypass_armor: false,
+            source_label: "bullet".into(),
+            triggered_critical: false,
+        };
+        let outcome = apply_damage(&mut world, dmg);
+
+        // The wound transition must be None → Seriously (started at full HP).
+        assert_eq!(
+            outcome.wound_state_change,
+            Some((WoundState::None, WoundState::Seriously)),
+            "expected None → Seriously transition"
+        );
+        // The Seriously effect installs AllActionsPenalty(-2) on the stack.
+        assert_eq!(
+            world.pc.all_actions_penalty(),
+            -2,
+            "Seriously Wounded must impose AllActionsPenalty(-2)"
+        );
+        // Verify no Mortally modifier leaked in (-4 must not be present).
+        let has_minus_four = world
+            .pc
+            .effects
+            .iter_modifiers()
+            .any(|m| matches!(m, crate::effects::EffectModifier::AllActionsPenalty(-4)));
+        assert!(!has_minus_four, "Seriously must NOT install the -4 penalty");
+    }
+
+    /// WP-304 acceptance: when a Seriously Wounded character takes enough
+    /// additional damage to reach HP ≤ 0, the old Seriously effect (-2) is
+    /// removed and the Mortally Wounded effect (-4 all actions, -6 MOVE) is
+    /// installed in its place — leaving exactly one wound-state effect.
+    ///
+    /// Rulebook: p.186 — "Each new Wound State replaces the effect of your
+    /// previous Wound State." / Mortally Wounded: "-4 to all Actions, -6 to
+    /// MOVE (Minimum 1)."
+    #[test]
+    fn test_mortally_replaces_seriously() {
+        // Build a PC already at Seriously Wounded (HP = 10, threshold 15,
+        // max 30). We set this up manually so the test starts from a known
+        // mid-combat state rather than driving it via two `apply_damage` calls.
+        let mut pc = pc_with_max_hp_wp304(30, 6);
+        pc.wounds.current_hp = 10;
+        // Drive update_wound_state to install the Seriously effect before
+        // we start the test proper.
+        pc.update_wound_state();
+        assert_eq!(
+            pc.wounds.current_state,
+            WoundState::Seriously,
+            "precondition: PC must be Seriously Wounded"
+        );
+        assert_eq!(
+            pc.all_actions_penalty(),
+            -2,
+            "precondition: -2 effect must be on the stack"
+        );
+
+        let pc_id = pc.id.0;
+        let mut world = World::new(pc);
+
+        // Deal 10 more damage (no armor) → HP goes from 10 → 0 → Mortally.
+        let dmg = DamageApplication {
+            target: EntityId(pc_id),
+            raw_damage: 10,
+            location: HitLocation::Body,
+            bypass_armor: false,
+            source_label: "bullet".into(),
+            triggered_critical: false,
+        };
+        let outcome = apply_damage(&mut world, dmg);
+
+        // Transition must be Seriously → Mortally.
+        assert_eq!(
+            outcome.wound_state_change,
+            Some((WoundState::Seriously, WoundState::Mortally)),
+            "expected Seriously → Mortally transition"
+        );
+
+        // The -4 AllActionsPenalty (Mortally effect) must now be active…
+        assert_eq!(
+            world.pc.all_actions_penalty(),
+            -4,
+            "Mortally Wounded must impose AllActionsPenalty(-4)"
+        );
+
+        // …and the old -2 (Seriously) must be gone: no leftover penalty
+        // from the prior state should accumulate (-4 only, not -6 total).
+        let has_minus_two = world
+            .pc
+            .effects
+            .iter_modifiers()
+            .any(|m| matches!(m, crate::effects::EffectModifier::AllActionsPenalty(-2)));
+        assert!(
+            !has_minus_two,
+            "Seriously -2 effect must be removed when transitioning to Mortally"
+        );
+
+        // Exactly ONE wound-state sourced effect must be on the stack.
+        let wound_effect_count = world
+            .pc
+            .effects
+            .iter()
+            .filter(|e| matches!(e.source, crate::effects::EffectSource::WoundState(_)))
+            .count();
+        assert_eq!(
+            wound_effect_count, 1,
+            "exactly one wound-state effect must be on the stack (no Seriously leftover)"
+        );
+
+        // The Mortally effect also includes MovePenalty(-6); with base MOVE 5,
+        // current_move() must be floored at 1 (5 - 6 = -1, floor = 1).
+        assert_eq!(
+            world.pc.current_move(),
+            1,
+            "MOVE floored to 1 under Mortally Wounded (-6 MOVE, p.186)"
+        );
+    }
+
+    /// WP-304 acceptance: healing a Mortally Wounded character (by directly
+    /// raising `current_hp` and calling `update_wound_state`) removes the
+    /// Mortally effect and restores normal penalty queries.
+    ///
+    /// This exercises the heal-up path of `update_wound_state` — which must
+    /// drop the Mortally effect from the stack when HP rises back above the
+    /// Mortally threshold (i.e., HP becomes > 0).
+    ///
+    /// Note: Healing past Mortally does NOT set `WoundState::Dead` to
+    /// `WoundState::None` directly; Dead is terminal and requires the
+    /// `update_wound_state` Dead-guard. We therefore test the non-Dead case:
+    /// a character at Mortally (HP = 0) who is healed to HP = 25 (which is
+    /// above the Seriously threshold of 15, so the state becomes Lightly).
+    ///
+    /// Rulebook: p.186 — Mortally Wounded: DV15 to heal back to 1 HP and
+    /// Unconscious. The heal itself is out of scope here; we test the
+    /// effect-stack bookkeeping that must happen after any HP restoration.
+    #[test]
+    fn test_healing_back_removes_mortally() {
+        // Start with a PC at Mortally Wounded (HP = 0, max 30, threshold 15).
+        let mut pc = pc_with_max_hp_wp304(30, 6);
+        pc.wounds.current_hp = 0;
+        pc.update_wound_state();
+        assert_eq!(
+            pc.wounds.current_state,
+            WoundState::Mortally,
+            "precondition: PC must be Mortally Wounded"
+        );
+        // Mortally effect installs -4 all actions and -6 MOVE.
+        assert_eq!(
+            pc.all_actions_penalty(),
+            -4,
+            "precondition: -4 effect must be on the stack"
+        );
+        assert_eq!(
+            pc.current_move(),
+            1,
+            "precondition: MOVE floored at 1 under Mortally"
+        );
+
+        // Simulate a successful heal: raise HP to 25 and call update_wound_state.
+        // HP 25 > threshold 15 → state should become Lightly (or None if max);
+        // 25 < 30 (not full) → state is Lightly.
+        pc.wounds.current_hp = 25;
+        let new_state = pc.update_wound_state();
+
+        // State transitions from Mortally → Lightly.
+        assert_eq!(
+            new_state,
+            Some(WoundState::Lightly),
+            "healing to HP 25 (above threshold 15) must transition to Lightly"
+        );
+        assert_eq!(pc.wounds.current_state, WoundState::Lightly);
+
+        // The -4 Mortally effect must be gone.
+        assert_eq!(
+            pc.all_actions_penalty(),
+            0,
+            "Mortally -4 effect must be removed after healing above the threshold"
+        );
+
+        // The -6 MOVE penalty must also be gone — base MOVE 5 restored.
+        assert_eq!(
+            pc.current_move(),
+            5,
+            "MOVE penalty must be removed after healing; base MOVE 5 should be restored"
+        );
+
+        // No wound-state effect sourced from Mortally must remain.
+        let mortally_effect_still_present = pc.effects.iter().any(|e| {
+            matches!(
+                e.source,
+                crate::effects::EffectSource::WoundState(WoundState::Mortally)
+            )
+        });
+        assert!(
+            !mortally_effect_still_present,
+            "Mortally effect must be removed from the stack after healing"
+        );
+
+        // Lightly Wounded has no wound effect (p.186: "None" in the
+        // Wound Effect column). Verify no wound-state effect is on the stack.
+        let wound_effect_count = pc
+            .effects
+            .iter()
+            .filter(|e| matches!(e.source, crate::effects::EffectSource::WoundState(_)))
+            .count();
+        assert_eq!(
+            wound_effect_count, 0,
+            "Lightly Wounded must have no wound-state effect on the stack"
+        );
+    }
 }
