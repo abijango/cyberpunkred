@@ -16,6 +16,7 @@ pub mod abilities;
 pub mod actions;
 pub mod architecture;
 pub mod demon;
+pub mod integration;
 pub mod programs;
 pub mod state;
 pub mod virus;
