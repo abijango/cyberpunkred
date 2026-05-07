@@ -6,12 +6,14 @@
 //! and the single place mutable game state lives during a play session.
 //!
 //! [`CombatState`] is now the real type from WP-301 (`crate::combat`).
-//! [`NetrunState`] / [`GigState`] remain placeholders until WP-401 / WP-604
-//! land. Defining the slots now lets every downstream WP refer to a stable
+//! [`NetrunState`] is now the real type from WP-402 (`crate::netrunning::state`).
+//! [`GigState`] remains a placeholder until WP-604 lands.
+//! Defining the slots now lets every downstream WP refer to a stable
 //! [`World`] shape.
 
 use crate::character::Character;
 use crate::combat::CombatState;
+use crate::netrunning::state::NetrunState;
 use crate::types::{EntityId, NpcId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -109,10 +111,6 @@ pub struct GameClock {
     /// Minutes elapsed since midnight. `0..1440`.
     pub minutes_into_day: u16,
 }
-
-/// Netrun state placeholder. Populated by a later WP.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct NetrunState;
 
 /// Gig state placeholder. Populated by a later WP.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]

@@ -7,5 +7,8 @@
 //!
 //! - [`architecture`] — NET architecture data model and procedural generator
 //!   ([`architecture::generate_net_architecture`]). See pp.209–212, 217.
+//! - [`state`] — Active netrun state: programs rezzed, floors revealed,
+//!   control nodes held, viruses queued. See pp.197–200.
 
 pub mod architecture;
+pub mod state;
