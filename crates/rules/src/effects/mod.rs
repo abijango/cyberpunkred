@@ -243,7 +243,19 @@ pub struct DrugId(pub String);
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub struct ProgramId(pub String);
 
-/// Role-ability slug. Real catalog lands in WP-213.
+/// Open content slug naming a Role Ability *sub-feature* as the source of an
+/// effect (e.g. `"combat_awareness.precision_attack"`,
+/// `"moto.family_motorpool"`).
+///
+/// **Coexists with [`crate::catalog::roles::RoleAbilityKind`]** — see the
+/// catalog module docs for the rationale. In short: `RoleAbilityKind` is the
+/// closed-enum *catalog handle* (one of ten), while `RoleAbilityId` is the
+/// *effect-source slug* the [`EffectSource::RoleAbility`] payload carries
+/// to attribute a buff/debuff to a specific named sub-feature for narration
+/// and UI. Sub-feature granularity (Solo's six Combat Awareness specialties,
+/// Tech's four Maker specialties, etc.) is not yet a closed set, so it
+/// stays as a string slug; closed-enum migration is left to a later WP if
+/// the sub-feature set stabilises.
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 pub struct RoleAbilityId(pub String);
 

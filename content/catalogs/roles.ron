@@ -1,0 +1,253 @@
+// Role catalog — Cyberpunk RED.
+//
+// Source pages:
+//   pp.32–39  Role chapters (Rockerboy, Solo, Netrunner, Tech, Medtech,
+//             Media, Exec, Lawman, Fixer, Nomad). Each chapter ends with a
+//             "Role Ability:" callout naming the canonical Role Ability.
+//   pp.142–161 Role Abilities chapter (mechanical detail, page anchors per
+//             Role Ability listed in roles.rs module docs).
+//   pp.86–88  Streetrat / Edgerunner templates — used to source the
+//             `flavor_skill_emphasis` defaults below.
+//
+// Schema: every entry has
+//   slug: string                       // catalog lookup key
+//   role: Role                         // closed-enum id
+//   display_name: string               // book display name
+//   role_ability: RoleAbilityKind      // matches catalog::roles::role_ability_for
+//   flavor_skill_emphasis: [SkillId]   // suggested-at-creation skill set
+//
+// Naming deviations from WP-213 spec (see catalog::roles module docs):
+//   Solo's ability is **Combat Awareness** per p.146 (WP spec said
+//   `CombatSense`); Exec's ability is **Teamwork** per p.153 (WP spec said
+//   `Resources`). Implementation follows RAW.
+RolesFile(
+    roles: [
+        // -- Rockerboy (p.32, ability p.144) --
+        // Streetrat skill emphasis: Charismatic Impact (Role), Brawling,
+        // Concentration, Conversation, Education, Language(Streetslang),
+        // LocalExpert(Your Home), Perception, Persuasion, PlayInstrument,
+        // Composition, Wardrobe & Style. The Role chapter on p.32 stresses
+        // performance, persuasion, and showmanship — a curated subset
+        // serves as flavour guidance here.
+        (
+            slug: "rockerboy",
+            role: Rockerboy,
+            display_name: "Rockerboy",
+            role_ability: CharismaticImpact,
+            flavor_skill_emphasis: [
+                PlayInstrument(Singing),
+                Composition,
+                Persuasion,
+                Acting,
+                WardrobeStyle,
+                Streetwise,
+                Brawling,
+                Handgun,
+            ],
+        ),
+
+        // -- Solo (p.33, ability p.146) --
+        // Streetrat skill emphasis (p.86): the Solo template puts +6 in
+        // Handgun and Shoulder Arms, +4 in Brawling/Evasion/Stealth, +2 in
+        // tactical fundamentals. Combat Awareness is the Role Ability.
+        (
+            slug: "solo",
+            role: Solo,
+            display_name: "Solo",
+            role_ability: CombatAwareness,
+            flavor_skill_emphasis: [
+                Handgun,
+                ShoulderArms,
+                Autofire,
+                HeavyWeapons,
+                Brawling,
+                Evasion,
+                Stealth,
+                Tactics,
+                Athletics,
+                Perception,
+            ],
+        ),
+
+        // -- Netrunner (p.33, ability p.147) --
+        // Netrunners build around Interface (the NET-action driver) plus
+        // the technical / cracking skills used to navigate Architectures.
+        (
+            slug: "netrunner",
+            role: Netrunner,
+            display_name: "Netrunner",
+            role_ability: Interface,
+            flavor_skill_emphasis: [
+                ElectronicsSecurityTech,
+                Cybertech,
+                Cryptography,
+                LibrarySearch,
+                Education,
+                Perception,
+                Stealth,
+                Handgun,
+                Composition,
+                BasicTech,
+            ],
+        ),
+
+        // -- Tech (p.34, ability p.147) --
+        // Tech's Maker Specialties cover Field/Upgrade/Fabrication/Invention
+        // expertise — the Tech Skill suite (Basic / Cybertech / Weaponstech
+        // / Vehicle Tech / Electronics) is the base they jury-rig from.
+        (
+            slug: "tech",
+            role: Tech,
+            display_name: "Tech",
+            role_ability: Maker,
+            flavor_skill_emphasis: [
+                BasicTech,
+                Cybertech,
+                ElectronicsSecurityTech,
+                Weaponstech,
+                LandVehicleTech,
+                AirVehicleTech,
+                Education,
+                Science(Chemistry),
+                FirstAid,
+                Perception,
+            ],
+        ),
+
+        // -- Medtech (p.34, ability p.149) --
+        // Medicine Specialties: Surgery, Medical Tech (Pharmaceuticals),
+        // Medical Tech (Cryosystem Operation). The non-Role-locked Tech
+        // skills (First Aid, Paramedic, Cybertech, Pharmaceuticals) round
+        // out the Medtech's flavour.
+        (
+            slug: "medtech",
+            role: Medtech,
+            display_name: "Medtech",
+            role_ability: Medicine,
+            flavor_skill_emphasis: [
+                FirstAid,
+                Paramedic,
+                Cybertech,
+                Science(Biology),
+                Science(Chemistry),
+                HumanPerception,
+                Education,
+                Concentration,
+                Conversation,
+                Perception,
+            ],
+        ),
+
+        // -- Media (p.35, ability p.151) --
+        // Credibility drives Rumor and story Believability/Audience/Impact.
+        // The Media's day-to-day skill set centres on investigation and
+        // information sourcing.
+        (
+            slug: "media",
+            role: Media,
+            display_name: "Media",
+            role_ability: Credibility,
+            flavor_skill_emphasis: [
+                Composition,
+                LibrarySearch,
+                Conversation,
+                HumanPerception,
+                Persuasion,
+                Streetwise,
+                PhotographyFilm,
+                Acting,
+                Perception,
+                Bureaucracy,
+            ],
+        ),
+
+        // -- Lawman (p.37, ability p.158) --
+        // Backup calls in tiered law-enforcement support. Lawmen tend to
+        // pair up Handgun/Shoulder Arms with investigative skills.
+        (
+            slug: "lawman",
+            role: Lawman,
+            display_name: "Lawman",
+            role_ability: Backup,
+            flavor_skill_emphasis: [
+                Handgun,
+                ShoulderArms,
+                Brawling,
+                Evasion,
+                Athletics,
+                Criminology,
+                Interrogation,
+                Tactics,
+                Streetwise,
+                Perception,
+            ],
+        ),
+
+        // -- Exec (p.36, ability p.153) --
+        // Teamwork provides Signing Bonus, Corporate Housing, Health
+        // Insurance, and Team Members. The Exec's lifeskill set leans
+        // heavily on Business / Bureaucracy / Persuasion / Trading.
+        (
+            slug: "exec",
+            role: Exec,
+            display_name: "Exec",
+            role_ability: Teamwork,
+            flavor_skill_emphasis: [
+                Business,
+                Bureaucracy,
+                AccountingFinance,
+                Persuasion,
+                Trading,
+                HumanPerception,
+                Conversation,
+                WardrobeStyle,
+                Education,
+                Handgun,
+            ],
+        ),
+
+        // -- Fixer (p.38, ability p.159) --
+        // Operator covers Contacts, Reach, Haggle, Grease tiers; a Fixer's
+        // baseline is social manipulation + market knowledge.
+        (
+            slug: "fixer",
+            role: Fixer,
+            display_name: "Fixer",
+            role_ability: Operator,
+            flavor_skill_emphasis: [
+                Trading,
+                Streetwise,
+                Bribery,
+                Persuasion,
+                Conversation,
+                HumanPerception,
+                Forgery,
+                Business,
+                Handgun,
+                Perception,
+            ],
+        ),
+
+        // -- Nomad (p.39, ability p.161) --
+        // Moto adds Rank to every vehicular Skill check. Nomads pair the
+        // vehicle suite with survival and (often) gunplay.
+        (
+            slug: "nomad",
+            role: Nomad,
+            display_name: "Nomad",
+            role_ability: Moto,
+            flavor_skill_emphasis: [
+                DriveLandVehicle,
+                PilotAirVehicle,
+                PilotSeaVehicle,
+                LandVehicleTech,
+                AirVehicleTech,
+                SeaVehicleTech,
+                Handgun,
+                ShoulderArms,
+                WildernessSurvival,
+                AnimalHandling,
+            ],
+        ),
+    ],
+)

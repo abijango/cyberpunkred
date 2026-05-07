@@ -18,6 +18,7 @@ pub mod types;
 pub mod world;
 
 pub use catalog::armor::{Armor, ArmorId, ArmorKind, ArmorLocation, ArmorPenalty};
+pub use catalog::roles::{RoleAbilityKind, RoleDefinition};
 pub use catalog::skills::{
     Instrument, LanguageKind, LocalArea, MartialArtsForm, ScienceField, SkillCategory,
     SkillDefinition, SkillId,
