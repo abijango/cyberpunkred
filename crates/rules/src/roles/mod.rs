@@ -18,3 +18,4 @@
 
 pub mod combat_sense;
 pub mod interface;
+pub mod maker;
