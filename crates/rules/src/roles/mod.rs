@@ -21,3 +21,4 @@ pub mod combat_sense;
 pub mod interface;
 pub mod maker;
 pub mod medicine;
+pub mod operator;
