@@ -1487,10 +1487,10 @@ pub fn create_streetrat(role: Role, name: String, rng: &mut Rng) -> Result<Chara
     };
 
     // 3. Assign starting skills.
-    let skills = streetrat_skills(role);
+    let skills = create_streetrat_skills(role);
 
     // 4. Assign starting gear and cyberware.
-    let (armor, inventory, cyberware) = streetrat_gear(role);
+    let (armor, inventory, cyberware) = create_streetrat_gear(role);
 
     // 5. Build the Character.
     // Derive a deterministic CharacterId from the RNG so the create pipeline
@@ -1541,7 +1541,11 @@ pub fn create_streetrat(role: Role, name: String, rng: &mut Rng) -> Result<Chara
 /// is therefore set to `Language(Streetslang)` at level 2 here (the
 /// universal default) and can be updated by the Lifepath roller (WP-504)
 /// once the cultural origin is known.
-fn streetrat_skills(role: Role) -> SkillSet {
+///
+/// `pub(super)` so that sibling creation modules (e.g. `edgerunner`)
+/// can reuse this skill package without duplicating the tables (§0.2
+/// design simplification: Edgerunner uses Streetrat skill list).
+pub(super) fn create_streetrat_skills(role: Role) -> SkillSet {
     let mut ranks: HashMap<SkillId, u8> = HashMap::new();
 
     // Helper to insert without overwriting a higher rank.
@@ -1831,7 +1835,11 @@ fn streetrat_skills(role: Role) -> SkillSet {
 ///
 /// Cyberware: the book lists a Cyberdeck for Netrunners only (p.98 notes).
 /// No other role receives starting cyberware under the Streetrat option.
-fn streetrat_gear(role: Role) -> (WornArmor, Inventory, Vec<InstalledCyberware>) {
+///
+/// `pub(super)` so that sibling creation modules (e.g. `edgerunner`)
+/// can reuse this gear package without duplicating the tables (§0.2
+/// design simplification: Edgerunner uses Streetrat gear list).
+pub(super) fn create_streetrat_gear(role: Role) -> (WornArmor, Inventory, Vec<InstalledCyberware>) {
     // Standard armor: Light Armorjack body + head. SP 11, no penalty.
     let armor = WornArmor {
         body: Some(ArmorPiece {
