@@ -16,4 +16,4 @@
 //! - [`charismatic_impact`] (WP-518, Rockerboy) — performance-driven sway. See p.142+.
 //! - [`moto`] (WP-519, Nomad) — vehicle handling bonus. See p.142+.
 
-// Sub-modules will be declared by their respective WPs as they land.
+pub mod combat_sense;
