@@ -11,6 +11,7 @@
 //! states), pp.81–90 (skills).
 
 pub mod creation;
+pub mod cyberware;
 pub mod data;
 pub mod derive;
 pub mod hp;
