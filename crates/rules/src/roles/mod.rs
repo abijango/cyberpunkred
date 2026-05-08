@@ -23,3 +23,4 @@ pub mod interface;
 pub mod maker;
 pub mod medicine;
 pub mod operator;
+pub mod resources;
