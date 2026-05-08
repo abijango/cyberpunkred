@@ -8,4 +8,4 @@
 //! - [`spend`] (WP-508) — spend IP on Skill / Role rank increases. See pp.408–411.
 //! - [`earn`] (WP-509) — milestone IP awards (gig-completed, enemy-defeated, etc.).
 
-// Sub-modules will be declared by their respective WPs as they land.
+pub mod earn;
