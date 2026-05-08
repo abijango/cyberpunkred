@@ -18,6 +18,7 @@
 
 pub mod backup;
 pub mod combat_sense;
+pub mod credibility;
 pub mod interface;
 pub mod maker;
 pub mod medicine;
