@@ -9,4 +9,4 @@
 //! - [`edgerunner`] (WP-502) — mid-tier point-buy. See pp.78–79+.
 //! - [`complete`] (WP-503) — full point-buy. See pp.78+.
 
-// Sub-modules will be declared by their respective WPs as they land.
+pub mod streetrat;
