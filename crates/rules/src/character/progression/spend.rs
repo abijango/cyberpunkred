@@ -341,7 +341,7 @@ mod tests {
         );
         // Character must be unchanged
         assert_eq!(c.improvement_points, 10);
-        assert!(c.skills.ranks.get(&SkillId::Handgun).is_none());
+        assert!(!c.skills.ranks.contains_key(&SkillId::Handgun));
     }
 
     /// Acceptance: spending on a skill already at rank 10 returns RankCapReached.
