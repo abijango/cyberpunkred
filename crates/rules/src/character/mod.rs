@@ -19,6 +19,7 @@ pub mod hp;
 pub mod lifepath;
 pub mod luck;
 pub mod progression;
+pub mod therapy;
 pub mod wounds;
 
 pub use data::{
