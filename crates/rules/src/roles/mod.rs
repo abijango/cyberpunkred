@@ -25,3 +25,4 @@ pub mod maker;
 pub mod medicine;
 pub mod moto;
 pub mod operator;
+pub mod resources;

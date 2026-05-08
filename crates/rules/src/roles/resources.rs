@@ -1,15 +1,15 @@
-//! Teamwork (Exec Role Ability) — WP-516.
+//! Teamwork (Exec Role Ability) -- WP-516.
 //!
 //! ## Name disambiguation
 //!
-//! The rulebook (pp.153–154) names this ability **"Teamwork"**. The WP-516
+//! The rulebook (pp.153-154) names this ability **"Teamwork"**. The WP-516
 //! spec uses "Resources" as the module/API slug. This module honours the spec
 //! slug (`resources`, `resources_rank`, `ResourcesPool`) in its public API
 //! while documenting the correct rulebook name in every doc comment. The
-//! engine slug is `resources` — callers should not rely on the string being
+//! engine slug is `resources` -- callers should not rely on the string being
 //! "teamwork". Deviation flagged in PR.
 //!
-//! ## Rulebook mechanics (pp.153–154)
+//! ## Rulebook mechanics (pp.153-154)
 //!
 //! The Exec's Teamwork ability gives them corporate backing across several
 //! tiers that scale with Rank:
@@ -20,9 +20,9 @@
 //! | Rank threshold | Total Team Members |
 //! |---|---|
 //! | < 3  | 0 |
-//! | 3–4  | 1 |
-//! | 5–8  | 2 |
-//! | 9–10 | 3 (maximum) |
+//! | 3-4  | 1 |
+//! | 5-8  | 2 |
+//! | 9-10 | 3 (maximum) |
 //!
 //! ### Corporate Benefits (p.153)
 //! Additional per-gig corporate resource access scales by rank:
@@ -41,7 +41,7 @@
 //! The rulebook does not specify an explicit per-gig Eurobucks pool keyed on
 //! Rank. The WP-516 spec contract requires a `money_per_gig` field on
 //! [`ResourcesPool`]. This implementation models it as a corporate "pull
-//! budget" — a reasonable extrapolation from the housing and benefit tiers:
+//! budget" -- a reasonable extrapolation from the housing and benefit tiers:
 //! each rank tier grants progressively larger discretionary funds the Exec can
 //! draw on for legitimate corporate business. Deviation from strict RAW flagged
 //! in PR; the exact table is GM-adjudicated in RAW.
@@ -61,7 +61,7 @@
 //! | 9  | 9,000eb |
 //! | 10 | 12,000eb |
 //!
-//! See pp.153–154.
+//! See pp.153-154.
 
 use crate::character::data::Role;
 use crate::character::Character;
@@ -74,9 +74,9 @@ use crate::types::Eurobucks;
 /// For any other role the ability does not apply; this function returns `0`
 /// so callers can skip application without special-casing the role check.
 ///
-/// See pp.153–154.
+/// See pp.153-154.
 pub fn resources_rank(character: &Character) -> u8 {
-    // See p.153 — Teamwork belongs exclusively to the Exec role.
+    // See p.153 -- Teamwork belongs exclusively to the Exec role.
     if character.role == Role::Exec {
         character.role_rank
     } else {
@@ -89,26 +89,26 @@ pub fn resources_rank(character: &Character) -> u8 {
 ///
 /// ## Fields
 ///
-/// - `money_per_gig` — discretionary corporate funds the Exec can draw on
-///   each gig. **Note:** RAW (pp.153–154) does not specify a numeric
+/// - `money_per_gig` -- discretionary corporate funds the Exec can draw on
+///   each gig. **Note:** RAW (pp.153-154) does not specify a numeric
 ///   Eurobucks pool; this field is an engine extrapolation from the benefit
 ///   tier progression. See the module-level deviation note.
 ///
-/// - `team_size` — number of NPC Team Members the corporation assigns.
+/// - `team_size` -- number of NPC Team Members the corporation assigns.
 ///   Derived from the RAW thresholds on p.154:
-///   - Rank 1–2: 0 members.
-///   - Rank 3–4: 1 member ("Starting at Rank 3, Teamwork gives the Exec a
+///   - Rank 1-2: 0 members.
+///   - Rank 3-4: 1 member ("Starting at Rank 3, Teamwork gives the Exec a
 ///     Team Member").
-///   - Rank 5–8: 2 members ("Rank 5 … give[s] the Exec an additional Team
+///   - Rank 5-8: 2 members ("Rank 5 gives the Exec an additional Team
 ///     Member").
-///   - Rank 9–10: 3 members ("Rank … 9 … give[s] the Exec an additional Team
+///   - Rank 9-10: 3 members ("Rank 9 gives the Exec an additional Team
 ///     Member, capping out at a maximum of 3 total Team Members at Rank 9").
 ///
-/// See pp.153–154.
+/// See pp.153-154.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResourcesPool {
     /// Monthly / per-gig corporate pull in Eurobucks. See module-level note.
-    /// See pp.153–154 (extrapolated; RAW does not specify a numeric table).
+    /// See pp.153-154 (extrapolated; RAW does not specify a numeric table).
     pub money_per_gig: Eurobucks,
     /// NPC Team Members allocated by the corporation. See p.154.
     pub team_size: u8,
@@ -122,13 +122,13 @@ pub struct ResourcesPool {
 ///
 /// Returns a zero pool (`money_per_gig = 0`, `team_size = 0`) for `rank == 0`.
 ///
-/// See pp.153–154.
+/// See pp.153-154.
 pub fn resources_pool(rank: u8) -> ResourcesPool {
     // Team member allocation per p.154:
     //   rank 0-2: 0 members
     //   rank 3-4: 1 member  ("Starting at Rank 3")
-    //   rank 5-8: 2 members ("Ranks 5 … give the Exec an additional Team Member")
-    //   rank 9+:  3 members ("Rank … 9 … capping out at a maximum of 3 … at Rank 9")
+    //   rank 5-8: 2 members ("Ranks 5 give the Exec an additional Team Member")
+    //   rank 9+:  3 members ("Rank 9 capping out at a maximum of 3 at Rank 9")
     let team_size = match rank {
         0..=2 => 0,
         3..=4 => 1,
@@ -136,7 +136,7 @@ pub fn resources_pool(rank: u8) -> ResourcesPool {
         _ => 3, // rank 9-10, max per p.154
     };
 
-    // Per-gig money pool — extrapolated; RAW has no explicit Eurobucks table.
+    // Per-gig money pool -- extrapolated; RAW has no explicit Eurobucks table.
     // Calibrated to the housing / benefit tiers on pp.153-154 so that
     // higher-ranking Execs can afford proportionally larger corporate pulls.
     let money_per_gig = match rank {
