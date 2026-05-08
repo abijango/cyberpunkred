@@ -9,3 +9,4 @@
 //! - [`earn`] (WP-509) — milestone IP awards (gig-completed, enemy-defeated, etc.).
 
 pub mod earn;
+pub mod spend;
