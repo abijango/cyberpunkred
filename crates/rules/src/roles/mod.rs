@@ -16,6 +16,7 @@
 //! - [`charismatic_impact`] (WP-518, Rockerboy) — performance-driven sway. See p.142+.
 //! - [`moto`] (WP-519, Nomad) — vehicle handling bonus. See p.142+.
 
+pub mod backup;
 pub mod combat_sense;
 pub mod interface;
 pub mod maker;
