@@ -1,6 +1,6 @@
 # Project Status — Cyberpunk Red CRPG
 
-**Snapshot:** 2026-05-07. Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
+**Snapshot:** 2026-05-08. Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
 
 ## Phase progress
 
@@ -11,46 +11,31 @@
 | 2 | Data catalogs (weapons, armor, cyberware, ICE, etc.) | 14 | ✅ complete |
 | 3 | Combat subsystems (initiative, attacks, damage, criticals) | 16 | ✅ complete |
 | 4 | Netrunning (architecture, abilities, ICE, demons) | 17 | ✅ complete |
-| 5 | Character & progression (creation, lifepath, role abilities, IP) | ~19 | not started |
+| 5 | Character & progression (creation, lifepath, role abilities, IP) | 19 | ✅ complete |
 | 6 | GM layer (Beat Charts, NPCs, campaign log) | ~13 | not started |
 | 7 | LLM layer (provider trait, prompts) | ~10 | not started |
 | 8 | Frontend (Leptos UI) | ~15 | not started |
 | 9 | Backend (Axum endpoints) | ~8 | not started |
 | 10 | Integration (sample gig, smoke tests, perf, docs) | ~4 | not started |
 
-**Test count:** 494 passing in `cpr_rules`. Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
+**Test count:** 634 passing in `cpr_rules` (up from 494 at end of Phase 4). Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
 
-**Source size:** 68 .rs files, ~35.9k lines in `crates/rules/src/`. 43 content files (~412 KB) under `content/`.
+**Source size growth:** Phase 5 added ~9k lines across `character/creation/`, `character/lifepath.rs`, `character/cyberware.rs`, `character/cyberpsychosis.rs`, `character/therapy.rs`, `character/progression/`, and 10 sub-modules under `roles/`.
 
-## What's next: Phase 5 — Character & Progression
+## What's next: Phase 6 — GM layer
 
-Phase 5 is the next major unlock. Per `IMPLEMENTATION_PLAN.md` §6 entry gates:
-- Phase 5 needs Phase 1 (✅) + WP-201 skills (✅) + WP-204 cyberware (✅) + WP-213 roles (✅) + WP-214 lifepath (✅). **All satisfied.**
+Phase 6 is the next major unlock. Per `IMPLEMENTATION_PLAN.md` §6 entry gates:
+- Phase 6 needs Phase 1 (✅) + WP-005 (Resolution trait, ✅). **All satisfied.**
 
-Phase 5 WPs (per `IMPLEMENTATION_PLAN.md` §4, around line 2552 onwards):
-- **WP-501** Streetrat character creation (Medium)
-- **WP-502** Edgerunner character creation (Medium)
-- **WP-503** Complete Package character creation (Large)
-- **WP-504** Lifepath roller (Medium)
-- **WP-505** Cyberware install + Humanity Loss (Medium)
-- **WP-506** Cyberpsychosis state (Small)
-- **WP-507** Therapy mechanic (Medium)
-- **WP-508** Improvement Point spending (Medium)
-- **WP-509** IP earning (objective milestones) (Small)
-- **WP-510** Role Ability: Combat Sense (Solo) (Small)
-- **WP-511** Role Ability: Interface (Netrunner) (Small)
-- **WP-512** Role Ability: Maker (Tech) (Medium)
-- **WP-513** Role Ability: Medicine (Medtech) (Medium)
-- **WP-514** Role Ability: Credibility (Media) (Small)
-- **WP-515** Role Ability: Backup (Lawman) (Small)
-- **WP-516** Role Ability: Resources (Exec) (Small)
-- **WP-517** Role Ability: Operator (Fixer) (Small)
-- **WP-518** Role Ability: Moto (Nomad) (Small)
-- **WP-519** Role Ability: Charismatic Impact (Rockerboy) (Small)
+Phase 6 introduces the `gm` crate — Beat Charts, NPC orchestration, campaign log. Read §4 around WP-601 onwards for the full WP list. Phase 6 has ~13 WPs.
 
-**Phase 5 internal dependency**: WP-501 (Streetrat) blocks WP-502, WP-503, WP-504. Most Role Ability WPs are independent and can run in parallel with creation.
+After Phase 6, the picture for the WP-1001 sample-gig demo:
+- **Phase 7 (LLM)** — provider trait, prompts. Needs WP-602 (Beat Chart schema) and WP-608 (digest).
+- **Phase 8 (Frontend)** — Leptos UI. Needs WP-001 + WP-202 + WP-203 + WP-302 + WP-401 (all ✅).
+- **Phase 9 (Backend)** — Axum endpoints. Needs WP-902 (server scaffolding).
+- **Phase 10** — sample gig + smoke tests + perf + docs. Needs Phases 5–9.
 
-After Phase 5, Phase 6 (GM layer), Phase 7 (LLM), Phase 8 (Frontend), Phase 9 (Backend) become viable. Phase 10 (sample gig demo) is the critical-path endpoint per `IMPLEMENTATION_PLAN.md` §3.
+If you want maximum throughput, Phase 8 (Frontend) and Phase 9 (Backend) can run in parallel with Phase 6/7 since they live in different crates (`web`, `server` vs `gm`, `llm`).
 
 ## Workflow lessons (read before launching Phase 5+)
 
@@ -75,6 +60,9 @@ These were learned the hard way during Phase 3+4. Apply them to keep orchestrati
 4. **Use Track 1 (cherry-pick + local consolidate)** for big batches. The path: `for branch in branches; do git checkout origin/$branch -- <new-file>; done` then hand-edit shared files, run gates, single commit, push to main, close superseded PRs.
 5. **PR-per-WP is fine for small waves (≤4 agents)** because cascade conflict cost is bounded.
 
+### Phase 5 confirmed the pattern works
+Phase 5's three waves (6 + 6 + 7 agents) used the prep-commit pattern and ran with significantly lower conflict overhead than Phase 3+4 Wave 3. Most conflicts were 1-line `pub mod foo;` additions to `roles/mod.rs` — auto-mergeable on first try when only 1-2 PRs touched it; needed manual resolution only when 3+ PRs cascaded. **CI clippy lints (`unnecessary_get_then_check`, `manual_range_contains`, `get_first`)** still occasionally bite — Sonnet's local toolchain is slightly behind CI's. Always tell agents to use `(2..=8).contains(&s)` over `s >= 2 && s <= 8`, `.first()` over `.get(0)`, `.contains_key(k)` over `.get(k).is_none()`.
+
 ## Open follow-ups / known debt
 
 These are tracked in commit messages and PR descriptions but worth surfacing here:
@@ -83,6 +71,19 @@ These are tracked in commit messages and PR descriptions but worth surfacing her
 - **`DiceSpec` is defined three times** locally in WP-202 weapons, WP-204 cyberware, WP-208 programs (and a fourth time in WP-209 Black ICE). All same shape `{ n: u8, die: DieKind }`. Worth a one-shot consolidation PR to a single shared type in `rules::dice`.
 - **`WrongProgramClass` aliases `ProgramWrongClass`** — both variants exist on `RulesError` with `{program, expected, got}` fields. Consolidate to one.
 - **`NetrunNotActive` aliases `NoActiveNetrun`** — same. Consolidate.
+- **`CatalogLoadFailed` reused as "catalog entry not found"** in WP-505 (cyberware) — semantic abuse. Add a dedicated `CatalogEntryNotFound { catalog: &'static str, slug: String }` variant in a follow-up.
+- **`IpInsufficient` reused as "money insufficient"** in WP-507 therapy — money is conceptually separate. Add a dedicated `InsufficientFunds { required: Eurobucks, available: Eurobucks }` variant.
+
+### Phase 5 deviations to revisit
+- **WP-503 Complete Package** — 13 Basic Skills minimum-rank-2 enforcement reuses `RankCapReached` for too-low values, which is semantically wrong. Add `BasicSkillBelowMinimum`.
+- **WP-507 Therapy** — humanity cap uses `10 × stats.emp` proxy; should use a tracked `humanity_max` field on Character once added.
+- **WP-512 Maker `Field` expertise** — `maker_cost` returns `Eurobucks(0)` since RAW gives no explicit jury-rig cost; GM adjudicates.
+- **WP-513 Medicine** — `pharmaceuticals_hp_healed` returns rank scaling factor, not absolute HP; the `BODY + WILL` baseline (Speedheal RAW) needs caller multiplication.
+- **WP-515 Backup arrival** — RAW is d6 in Rounds; engine returns deterministic minutes for planning. Fold into a richer `BackupArrival { rolls_to_arrive: u8 }` later.
+- **WP-516 Teamwork money_per_gig** — engine extrapolation; no RAW per-gig pool.
+- **WP-517 Operator multiplier** — Haggle effects (bulk deal, deferred payment) at intermediate ranks return 100 (no discount); needs a separate action-level mechanic.
+- **WP-518 Charismatic Impact tier brackets** — WP spec brackets differ slightly from RAW; reconcile in a future RAW-pass commit.
+- **WP-519 Family Motorpool** — returns vehicle-kind buckets, not specific vehicle slugs. Per-model rank gating needs catalog-level metadata.
 
 ### Unfinished spec items
 - **WP-104 `skill_base` uses `Stat::Int` stub** — superseded by `skill_base_with_stat(skill, linked_stat)` helper. Now that WP-201's skill catalog provides `linked_stat()`, `skill_base` could call it directly. Small refactor.
@@ -114,6 +115,7 @@ Phase exit gates per `IMPLEMENTATION_PLAN.md` §6:
 - **Phase 2** ✅: All catalogs load; every catalog has > 0 entries.
 - **Phase 3** ✅: All Phase 3 WPs merged; combat smoke-test path is end-to-end through the rules crate.
 - **Phase 4** ✅: All Phase 4 WPs merged; netrun path runs end-to-end.
+- **Phase 5** ✅: All 19 WPs merged. Streetrat / Edgerunner / Complete Package creation, Lifepath roller, cyberware install + Humanity Loss, cyberpsychosis, therapy, IP earn/spend, all 10 Role Abilities. A character can now be created via Streetrat, given a Lifepath, given starting cyberware (with HL applied), serialised/deserialised via RON.
 
 ## Architectural state of the rules crate
 
@@ -196,4 +198,32 @@ crates/rules/src/
         ├── mod.rs
         ├── active.rs         # WP-412 (Boosters & Defenders)
         └── attackers.rs      # WP-413
+
+crates/rules/src/character/  (Phase 5 additions)
+├── creation/
+│   ├── mod.rs
+│   ├── streetrat.rs          # WP-501 Streetrat creation
+│   ├── edgerunner.rs         # WP-502 Edgerunner creation
+│   └── complete.rs           # WP-503 Complete Package creation
+├── lifepath.rs               # WP-504 lifepath roller
+├── cyberware.rs              # WP-505 install + Humanity Loss
+├── cyberpsychosis.rs         # WP-506 cyberpsychosis state
+├── therapy.rs                # WP-507 therapy mechanic
+└── progression/
+    ├── mod.rs
+    ├── spend.rs              # WP-508 IP spending
+    └── earn.rs               # WP-509 IP earning milestones
+
+crates/rules/src/roles/  (Phase 5 additions)
+├── mod.rs
+├── combat_sense.rs           # WP-510 Solo
+├── interface.rs              # WP-511 Netrunner
+├── maker.rs                  # WP-512 Tech
+├── medicine.rs               # WP-513 Medtech
+├── credibility.rs            # WP-514 Media
+├── backup.rs                 # WP-515 Lawman
+├── resources.rs              # WP-516 Exec
+├── operator.rs               # WP-517 Fixer
+├── charismatic_impact.rs     # WP-518 Rockerboy
+└── moto.rs                   # WP-519 Nomad
 ```
