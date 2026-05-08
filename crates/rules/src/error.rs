@@ -142,6 +142,50 @@ pub enum RulesError {
         /// Index of the architecture's bottom floor.
         bottom_floor: usize,
     },
+    /// Cyberware install rejected because a prerequisite item is missing
+    /// (WP-505). e.g. installing Interface Plugs requires a Neural Link.
+    /// See p.227 (cyberware installation rules).
+    MissingPrerequisite {
+        /// The cyberware item the caller tried to install.
+        item: String,
+        /// The slug of the missing prerequisite.
+        prerequisite: String,
+    },
+    /// Cyberware install rejected because the target's option slots cannot
+    /// fit the new item (WP-505). See p.227.
+    OptionSlotsExhausted {
+        /// Free option slots remaining on the foundational piece.
+        available: u8,
+        /// Slots the new item demands.
+        needed: u8,
+    },
+    /// A character action required positive Humanity but the character has
+    /// dropped to or below 0 (WP-506). See pp.226-230 (Cyberpsychosis).
+    HumanityBelowZero,
+    /// IP spend rejected because the character does not have enough
+    /// Improvement Points (WP-508). See p.411.
+    IpInsufficient {
+        /// IP cost of the requested upgrade.
+        required: u32,
+        /// IP currently in the character's pool.
+        available: u32,
+    },
+    /// Skill or Role rank cannot be raised — already at maximum (WP-508).
+    /// Skills cap at 10 (p.411); Role Abilities cap at 10 (p.142).
+    RankCapReached {
+        /// Current rank value at the time of the request.
+        current: u8,
+        /// Maximum rank allowed.
+        max: u8,
+    },
+    /// Lifepath roller produced an out-of-range roll for the named table
+    /// (WP-504/WP-214). Indicates a corrupt RON file or a test-fixture bug.
+    InvalidLifepathRoll {
+        /// Name of the lifepath table the roll was for.
+        table: String,
+        /// The out-of-range roll value.
+        roll: u8,
+    },
 }
 
 impl fmt::Display for RulesError {
@@ -235,6 +279,30 @@ impl fmt::Display for RulesError {
                 f,
                 "not on the bottom floor: at {current_floor}, bottom is {bottom_floor} (p.200)"
             ),
+            RulesError::MissingPrerequisite { item, prerequisite } => write!(
+                f,
+                "cyberware '{item}' requires prerequisite '{prerequisite}' which is not installed"
+            ),
+            RulesError::OptionSlotsExhausted { available, needed } => write!(
+                f,
+                "option slots exhausted: needed {needed}, only {available} free"
+            ),
+            RulesError::HumanityBelowZero => {
+                write!(f, "Humanity is below zero — Cyberpsychosis applies")
+            }
+            RulesError::IpInsufficient {
+                required,
+                available,
+            } => write!(
+                f,
+                "insufficient IP: required {required}, available {available}"
+            ),
+            RulesError::RankCapReached { current, max } => {
+                write!(f, "rank cap reached: current {current}, max {max}")
+            }
+            RulesError::InvalidLifepathRoll { table, roll } => {
+                write!(f, "invalid lifepath roll {roll} for table '{table}'")
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ pub mod movement;
 pub mod netrunning;
 pub mod resolution;
 pub mod rng;
+pub mod roles;
 pub mod types;
 pub mod world;
 

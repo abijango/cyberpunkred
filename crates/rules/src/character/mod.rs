@@ -10,10 +10,12 @@
 //! Rulebook references: pp.71–80 (stats and derived stats), p.186 (wound
 //! states), pp.81–90 (skills).
 
+pub mod creation;
 pub mod data;
 pub mod derive;
 pub mod hp;
 pub mod luck;
+pub mod progression;
 pub mod wounds;
 
 pub use data::{
