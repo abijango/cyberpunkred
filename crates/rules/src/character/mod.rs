@@ -15,6 +15,7 @@ pub mod cyberware;
 pub mod data;
 pub mod derive;
 pub mod hp;
+pub mod lifepath;
 pub mod luck;
 pub mod progression;
 pub mod wounds;
