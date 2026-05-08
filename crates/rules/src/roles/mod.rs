@@ -17,3 +17,4 @@
 //! - [`moto`] (WP-519, Nomad) — vehicle handling bonus. See p.142+.
 
 pub mod combat_sense;
+pub mod interface;
