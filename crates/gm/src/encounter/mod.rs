@@ -4,3 +4,6 @@
 //! - WP-610 — Encounter loader (`loader.rs`)
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6.
+
+pub mod loader;
+pub use loader::*;
