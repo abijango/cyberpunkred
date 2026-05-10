@@ -9,3 +9,12 @@ repository.workspace = true
 
 [lib]
 path = "src/lib.rs"
+
+[dependencies]
+cpr_rules = { path = "../rules" }
+serde = { version = "1", features = ["derive"] }
+thiserror = "1"
+# RON loaders for Phase 6 content (Beat Charts, NPC templates, encounters).
+ron = "0.8"
+
+[dev-dependencies]
