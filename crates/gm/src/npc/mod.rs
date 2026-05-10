@@ -8,7 +8,9 @@
 //! See `IMPLEMENTATION_PLAN.md` §6.
 
 pub mod entity;
+pub mod hiring;
 pub mod instantiate;
 
 pub use entity::NpcTemplateId;
+pub use hiring::*;
 pub use instantiate::*;
