@@ -6,5 +6,8 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6.
 
+pub mod digest;
 pub mod types;
+
+pub use digest::*;
 pub use types::*;
