@@ -8,3 +8,6 @@
 //! exclusively for the narrative-quality bonus the LLM returns.
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6.
+
+pub mod llm_bonus;
+pub use llm_bonus::*;

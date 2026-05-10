@@ -18,3 +18,4 @@ thiserror = "1"
 ron = "0.8"
 
 [dev-dependencies]
+uuid = { version = "1", features = ["serde"] }
