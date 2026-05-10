@@ -6,3 +6,7 @@
 //! - WP-612 — NPC ally hiring / Fixer integration (`hiring.rs`)
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6.
+
+pub mod entity;
+
+pub use entity::NpcTemplateId;
