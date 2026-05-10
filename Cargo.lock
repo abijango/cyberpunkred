@@ -38,6 +38,7 @@ name = "cpr_gm"
 version = "0.1.0"
 dependencies = [
  "cpr_rules",
+ "rand_core",
  "ron",
  "serde",
  "thiserror",

@@ -16,6 +16,11 @@ serde = { version = "1", features = ["derive"] }
 thiserror = "1"
 # RON loaders for Phase 6 content (Beat Charts, NPC templates, encounters).
 ron = "0.8"
+# UUID construction for deterministic EntityId / CharacterId generation.
+# No `v4` feature — IDs are seeded from the session RNG, not OS entropy.
+uuid = { version = "1", features = ["serde"] }
+# RngCore trait for next_u64() calls on &mut Rng in non-rules code.
+rand_core = { version = "0.9", default-features = false }
 
 [dev-dependencies]
 uuid = { version = "1", features = ["serde"] }
