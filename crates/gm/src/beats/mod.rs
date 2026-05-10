@@ -6,3 +6,6 @@
 //! - WP-604 — Beat state machine (`state.rs`)
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6 and rulebook pp.395–408.
+
+pub mod schema;
+pub use schema::*;
