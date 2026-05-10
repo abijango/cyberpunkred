@@ -5,3 +5,6 @@
 //! - WP-608 — Campaign log digest generator (`digest.rs`)
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6.
+
+pub mod types;
+pub use types::*;
