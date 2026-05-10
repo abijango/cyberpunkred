@@ -1,6 +1,6 @@
 # Project Status — Cyberpunk Red CRPG
 
-**Snapshot:** 2026-05-10. Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
+**Snapshot:** 2026-05-10 (post Wave 2). Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
 
 ## Phase progress
 
@@ -12,15 +12,15 @@
 | 3 | Combat subsystems (initiative, attacks, damage, criticals) | 16 | ✅ complete |
 | 4 | Netrunning (architecture, abilities, ICE, demons) | 17 | ✅ complete |
 | 5 | Character & progression (creation, lifepath, role abilities, IP) | 19 | ✅ complete |
-| 6 | GM layer (Beat Charts, NPCs, campaign log) | ~13 | 🟡 in progress (4/13: Wave 1 + prep done) |
+| 6 | GM layer (Beat Charts, NPCs, campaign log) | ~13 | 🟡 in progress (7/13: Waves 1+2 + prep done) |
 | 7 | LLM layer (provider trait, prompts) | ~10 | not started |
 | 8 | Frontend (Leptos UI) | ~15 | not started |
 | 9 | Backend (Axum endpoints) | ~8 | not started |
 | 10 | Integration (sample gig, smoke tests, perf, docs) | ~4 | not started |
 
-**Test count:** 634 passing in `cpr_rules` (preserved from Phase 5) + **16 in `cpr_gm`** = 650 unit tests. Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
+**Test count:** 634 passing in `cpr_rules` (preserved from Phase 5) + **37 in `cpr_gm`** + 12 `cpr_rules` doc-tests = **683 total**. Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
 
-**Source size growth:** Phase 5 added ~9k lines across `character/creation/`, `character/lifepath.rs`, `character/cyberware.rs`, `character/cyberpsychosis.rs`, `character/therapy.rs`, `character/progression/`, and 10 sub-modules under `roles/`. Phase 6 Wave 1 adds the `cpr_gm` crate skeleton (~1.5k lines): `error.rs` (22 variants), `ids.rs` (5 newtypes via macro), `beats/schema.rs` (Gig/Beat/Transition types), `npc/entity.rs` (NpcTemplate + ActiveNpc + 12 mook archetypes), `ip/llm_bonus.rs` (capped IP bonus).
+**Source size growth:** Phase 5 added ~9k lines across `character/creation/`, `character/lifepath.rs`, `character/cyberware.rs`, `character/cyberpsychosis.rs`, `character/therapy.rs`, `character/progression/`, and 10 sub-modules under `roles/`. Phase 6 so far (~3.5k lines): `error.rs` (22 variants), `ids.rs` (5 newtypes via macro), `beats/schema.rs`, `beats/loader.rs` (Gig loader+validator), `npc/entity.rs`, `npc/instantiate.rs` (NpcTemplate, MookStatline, instantiation), `log/types.rs` (CampaignLog event log), `ip/llm_bonus.rs`, plus `tools/content-validator/src/beats.rs` and the first content fixture `content/gigs/sample_gig.ron`.
 
 ## Phase 6 progress (in flight)
 
@@ -30,8 +30,8 @@ The `cpr_gm` crate is now stood up. Wave structure based on dependency analysis:
 |---|---|---|---|
 | Prep | WP-601 (gm scaffolding) | ✅ merged (`1f5a798`) | `GmError` 22 variants, slug-IDs, module skeleton |
 | 1 | WP-602 (Beat Chart schema), WP-605 (NPC entity model), WP-609 (IP bonus cap) | ✅ all merged (`a311493`, `f0c4c0c`, `f66fb53`) | 8 acceptance tests across the wave |
-| 2 | WP-603 (Beat loader/validator), WP-606 (NPC instantiation), WP-607 (Campaign log) | ⏳ next | Each depends on a Wave 1 WP |
-| 3 | WP-604 (Beat state machine), WP-608 (Digest), WP-610 (Encounter loader), WP-611 (Faction tracking), WP-612 (NPC ally hiring) | pending | Depends on Wave 2 |
+| 2 | WP-603 (Beat loader/validator), WP-606 (NPC instantiation), WP-607 (Campaign log) | ✅ all merged (`9767234`, `d317c4d`, `74e7eea`) | 21 new tests; zero file overlap between PRs |
+| 3 | WP-604 (Beat state machine), WP-608 (Digest), WP-610 (Encounter loader), WP-611 (Faction tracking), WP-612 (NPC ally hiring) | ⏳ next | All deps on main; 5 agents (within ≤6 cap) |
 | 4 | WP-613 (Mechanical hook resolver) | pending | Depends on WP-604 |
 
 **Key deviations landed in Wave 1:**
@@ -40,12 +40,21 @@ The `cpr_gm` crate is now stood up. Wave structure based on dependency analysis:
 - **WP-602's `MechanicalHookKind` filled in** the `OpposedCheck`, `Negotiation`, `Ambush` fields the plan left as `/* ... */` placeholders. Additive only; downstream WP-613 should consume these.
 - **Several `MechanicalHookKind` types reference `NpcId` by `String`** with `// TODO(WP-605)` markers; should be tightened to `NpcTemplateId` in a follow-up.
 
-## What's next: Phase 6 Wave 2
+**Key deviations landed in Wave 2:**
+- **WP-606 corrected Goon HP from 25 → 35** based on RAW p.412 (Bodyguard stat sheet). The agent prompt's "likely 25" was wrong. The agent correctly defied the prompt and trusted the rulebook. **Lesson: rulebook is the source of truth, not prompt hints.**
+- **WP-606 added `uuid` and `rand_core` to PROD deps** in `crates/gm/Cargo.toml` (previously dev-deps only). Needed for deterministic UUID construction in non-test code; both seeded from the `Rng` parameter — replay-safe.
+- **WP-603 used `&HashSet<NpcTemplateId>` and `&HashSet<LocationId>`** in `validate_gig` instead of the plan's `&Catalog<NpcTemplate>` / `&Catalog<LocationDef>` (the latter doesn't exist). Documented as a deferred tightening.
+- **WP-603 created `content/gigs/sample_gig.ron`** as the first Phase 6 content fixture (Hook → Development → Climax → Resolution).
+- **WP-607 dropped `Hash` from `KnowledgeFlag`** because `Eurobucks` (contained via `InDebt`) doesn't impl `Hash`.
 
-Wave 2 (3 agents, all unblocked by Wave 1):
-- **WP-603** Beat Chart loader and validator — depends on WP-602 ✅
-- **WP-606** NPC instantiation from template — depends on WP-605 ✅
-- **WP-607** Structured campaign log — depends on WP-605 ✅ (uses `NpcTemplateId`)
+## What's next: Phase 6 Wave 3
+
+Wave 3 (5 agents, all unblocked by Wave 2):
+- **WP-604** Beat state machine — depends on WP-602 ✅, WP-603 ✅, WP-006 ✅
+- **WP-608** Campaign log digest generator — depends on WP-607 ✅
+- **WP-610** Encounter loader — depends on WP-301 ✅, WP-302 ✅, WP-606 ✅
+- **WP-611** Faction and reputation tracking — depends on WP-607 ✅
+- **WP-612** NPC ally hiring (Fixer integration) — depends on WP-606 ✅, WP-517 ✅
 
 After Phase 6, the picture for the WP-1001 sample-gig demo:
 - **Phase 7 (LLM)** — provider trait, prompts. Needs WP-602 (Beat Chart schema) and WP-608 (digest).
@@ -87,6 +96,16 @@ Phase 5's three waves (6 + 6 + 7 agents) used the prep-commit pattern and ran wi
    - Tell agents to `git status` before staging and **add only files in their own module path** (`git add crates/gm/src/<my-topic>/`) rather than `git add -A` or `git add .`.
    - Tell agents to verify with `git diff origin/main...HEAD` that their PR contains only their own files before pushing.
 2. **Cargo.toml dev-deps need pre-staging too, not just shared types and modules.** Three Wave 1 agents independently added `uuid = { version = "1", features = ["serde"] }` to `[dev-dependencies]`. It auto-resolved because git merges identical-line-additions cleanly, but a one-character variation between agents would have required manual reconciliation. For Wave 2+, **pre-stage any dev-dep likely to be needed** in the prep commit — extend the "prep-stage shared types" pattern to include shared dev-deps.
+
+### Phase 6 Wave 2 — confirmations and one new lesson
+
+**Confirmation 1: the worktree-leak mitigation works.** The Wave 2 prompts included explicit instructions to `git add` specific paths only and run `git diff origin/main...HEAD --stat` before pushing. The WP-607 agent **explicitly detected contamination** in its working directory (WP-606 and WP-603 files present) and reverted them before staging — exactly the desired behavior. Result: all three Wave 2 PRs landed with **zero file overlap** between them, verified via `gh pr view --json files`.
+
+**Confirmation 2: the mod.rs cascade did NOT bite this wave.** Each Wave 2 PR added a non-overlapping `pub mod foo;` line (`loader`, `instantiate`, `types`) to a different module's `mod.rs`. Git treats non-adjacent additions as clean merges. The cascade-conflict failure mode happens when multiple PRs add adjacent lines to the *same* file; pre-staged module-shells (each agent owning a separate subdirectory's `mod.rs`) sidestep this entirely.
+
+**New lesson: trust the rulebook over prompt hints.** WP-606's prompt said Goon HP was "likely 25", but the agent read p.412 directly and used the RAW value of 35. **Do not put speculative rule-values in agent prompts** — they can override the agent's better judgement. When citing a rulebook value in a prompt, either check it first or explicitly tell the agent "verify against rulebook before using". A wrong number in a prompt anchors the agent and risks contaminating the codebase.
+
+**New lesson: `git pull` after merging sub-agent PRs, before running gates.** After all three Wave 2 PRs landed, the local main was 2 commits behind origin/main. The pull was blocked by orphan untracked files left over from the sub-agent worktrees (`crates/gm/src/beats/loader.rs`, etc.). Running `cargo test` against this stale state showed only 19 tests — looking like 18 had vanished. Removing the orphan files and pulling brought the count to the expected 37. **Always `rm -f` orphan worktree files and `git pull` before declaring a wave verified.**
 
 ## Open follow-ups / known debt
 
