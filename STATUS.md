@@ -1,6 +1,6 @@
 # Project Status — Cyberpunk Red CRPG
 
-**Snapshot:** 2026-05-08. Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
+**Snapshot:** 2026-05-10. Use `git log --oneline main` for the authoritative progress record; this document summarises state at the time of writing.
 
 ## Phase progress
 
@@ -12,22 +12,40 @@
 | 3 | Combat subsystems (initiative, attacks, damage, criticals) | 16 | ✅ complete |
 | 4 | Netrunning (architecture, abilities, ICE, demons) | 17 | ✅ complete |
 | 5 | Character & progression (creation, lifepath, role abilities, IP) | 19 | ✅ complete |
-| 6 | GM layer (Beat Charts, NPCs, campaign log) | ~13 | not started |
+| 6 | GM layer (Beat Charts, NPCs, campaign log) | ~13 | 🟡 in progress (4/13: Wave 1 + prep done) |
 | 7 | LLM layer (provider trait, prompts) | ~10 | not started |
 | 8 | Frontend (Leptos UI) | ~15 | not started |
 | 9 | Backend (Axum endpoints) | ~8 | not started |
 | 10 | Integration (sample gig, smoke tests, perf, docs) | ~4 | not started |
 
-**Test count:** 634 passing in `cpr_rules` (up from 494 at end of Phase 4). Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
+**Test count:** 634 passing in `cpr_rules` (preserved from Phase 5) + **16 in `cpr_gm`** = 650 unit tests. Workspace gates (`cargo fmt --check && cargo clippy --workspace -- -D warnings && cargo test --workspace && wasm-pack build crates/web --target web`) all green.
 
-**Source size growth:** Phase 5 added ~9k lines across `character/creation/`, `character/lifepath.rs`, `character/cyberware.rs`, `character/cyberpsychosis.rs`, `character/therapy.rs`, `character/progression/`, and 10 sub-modules under `roles/`.
+**Source size growth:** Phase 5 added ~9k lines across `character/creation/`, `character/lifepath.rs`, `character/cyberware.rs`, `character/cyberpsychosis.rs`, `character/therapy.rs`, `character/progression/`, and 10 sub-modules under `roles/`. Phase 6 Wave 1 adds the `cpr_gm` crate skeleton (~1.5k lines): `error.rs` (22 variants), `ids.rs` (5 newtypes via macro), `beats/schema.rs` (Gig/Beat/Transition types), `npc/entity.rs` (NpcTemplate + ActiveNpc + 12 mook archetypes), `ip/llm_bonus.rs` (capped IP bonus).
 
-## What's next: Phase 6 — GM layer
+## Phase 6 progress (in flight)
 
-Phase 6 is the next major unlock. Per `IMPLEMENTATION_PLAN.md` §6 entry gates:
-- Phase 6 needs Phase 1 (✅) + WP-005 (Resolution trait, ✅). **All satisfied.**
+The `cpr_gm` crate is now stood up. Wave structure based on dependency analysis:
 
-Phase 6 introduces the `gm` crate — Beat Charts, NPC orchestration, campaign log. Read §4 around WP-601 onwards for the full WP list. Phase 6 has ~13 WPs.
+| Wave | WPs | Status | Notes |
+|---|---|---|---|
+| Prep | WP-601 (gm scaffolding) | ✅ merged (`1f5a798`) | `GmError` 22 variants, slug-IDs, module skeleton |
+| 1 | WP-602 (Beat Chart schema), WP-605 (NPC entity model), WP-609 (IP bonus cap) | ✅ all merged (`a311493`, `f0c4c0c`, `f66fb53`) | 8 acceptance tests across the wave |
+| 2 | WP-603 (Beat loader/validator), WP-606 (NPC instantiation), WP-607 (Campaign log) | ⏳ next | Each depends on a Wave 1 WP |
+| 3 | WP-604 (Beat state machine), WP-608 (Digest), WP-610 (Encounter loader), WP-611 (Faction tracking), WP-612 (NPC ally hiring) | pending | Depends on Wave 2 |
+| 4 | WP-613 (Mechanical hook resolver) | pending | Depends on WP-604 |
+
+**Key deviations landed in Wave 1:**
+- **WP-605 renamed `NpcId` → `NpcTemplateId`** (the plan's `NpcId` for slug-based templates collides with `cpr_rules::NpcId` UUID for runtime instances). Documented as §5.2 "Coexist".
+- **WP-609 added `request_cap: u32` parameter** to `award_llm_bonus_ip` — the *caller* controls the cap, not the LLM's response.
+- **WP-602's `MechanicalHookKind` filled in** the `OpposedCheck`, `Negotiation`, `Ambush` fields the plan left as `/* ... */` placeholders. Additive only; downstream WP-613 should consume these.
+- **Several `MechanicalHookKind` types reference `NpcId` by `String`** with `// TODO(WP-605)` markers; should be tightened to `NpcTemplateId` in a follow-up.
+
+## What's next: Phase 6 Wave 2
+
+Wave 2 (3 agents, all unblocked by Wave 1):
+- **WP-603** Beat Chart loader and validator — depends on WP-602 ✅
+- **WP-606** NPC instantiation from template — depends on WP-605 ✅
+- **WP-607** Structured campaign log — depends on WP-605 ✅ (uses `NpcTemplateId`)
 
 After Phase 6, the picture for the WP-1001 sample-gig demo:
 - **Phase 7 (LLM)** — provider trait, prompts. Needs WP-602 (Beat Chart schema) and WP-608 (digest).
@@ -62,6 +80,13 @@ These were learned the hard way during Phase 3+4. Apply them to keep orchestrati
 
 ### Phase 5 confirmed the pattern works
 Phase 5's three waves (6 + 6 + 7 agents) used the prep-commit pattern and ran with significantly lower conflict overhead than Phase 3+4 Wave 3. Most conflicts were 1-line `pub mod foo;` additions to `roles/mod.rs` — auto-mergeable on first try when only 1-2 PRs touched it; needed manual resolution only when 3+ PRs cascaded. **CI clippy lints (`unnecessary_get_then_check`, `manual_range_contains`, `get_first`)** still occasionally bite — Sonnet's local toolchain is slightly behind CI's. Always tell agents to use `(2..=8).contains(&s)` over `s >= 2 && s <= 8`, `.first()` over `.get(0)`, `.contains_key(k)` over `.get(k).is_none()`.
+
+### Phase 6 Wave 1 — two new lessons
+
+1. **Worktree isolation can leak between parallel sub-agents.** Two of three Wave 1 agents (WP-602, WP-609) reported sharing a worktree — the WP-602 agent saw WP-609's in-progress files in its checkout. The WP-602 commit accidentally bundled WP-609's `ip/llm_bonus.rs` and `ip/mod.rs`. **It auto-resolved only because the WP-602 agent cherry-picked WP-609's code byte-identically** — when WP-609 merged first, the duplicates became no-ops. Had the agents written even slightly different versions of the shared files, manual rebase would have been required. Mitigations to apply going forward:
+   - Tell agents to `git status` before staging and **add only files in their own module path** (`git add crates/gm/src/<my-topic>/`) rather than `git add -A` or `git add .`.
+   - Tell agents to verify with `git diff origin/main...HEAD` that their PR contains only their own files before pushing.
+2. **Cargo.toml dev-deps need pre-staging too, not just shared types and modules.** Three Wave 1 agents independently added `uuid = { version = "1", features = ["serde"] }` to `[dev-dependencies]`. It auto-resolved because git merges identical-line-additions cleanly, but a one-character variation between agents would have required manual reconciliation. For Wave 2+, **pre-stage any dev-dep likely to be needed** in the prep commit — extend the "prep-stage shared types" pattern to include shared dev-deps.
 
 ## Open follow-ups / known debt
 
