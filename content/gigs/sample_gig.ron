@@ -1,0 +1,77 @@
+(
+    id: GigId("hot_property"),
+    title: "Hot Property",
+    fixer: "johnny_midnite",
+    payment: Costly(Eurobucks(1500)),
+    setting: "Corporate espionage in Night City.",
+    scope_hours: 4,
+    npcs: {},
+    locations: {
+        LocationId("ncpd_hq"): (
+            map: None,
+            description: "A neon-lit bar in Night City's combat zone.",
+        ),
+        LocationId("arasaka_lobby"): (
+            map: Some("arasaka_lobby_grid"),
+            description: "Corporate tower lobby; guards on every floor.",
+        ),
+    },
+    beats: [
+        (
+            id: BeatId("hook"),
+            kind: Hook,
+            location: LocationId("ncpd_hq"),
+            present: [],
+            intent: "Crew is hired via a tense meet.",
+            mechanical_hooks: [],
+            encounter: None,
+            transitions: [
+                (
+                    condition: Always,
+                    target: BeatId("dev"),
+                ),
+            ],
+        ),
+        (
+            id: BeatId("dev"),
+            kind: Development,
+            location: LocationId("ncpd_hq"),
+            present: [],
+            intent: "Crew gets more intel from their contact.",
+            mechanical_hooks: [],
+            encounter: None,
+            transitions: [
+                (
+                    condition: Always,
+                    target: BeatId("climax"),
+                ),
+            ],
+        ),
+        (
+            id: BeatId("climax"),
+            kind: Climax,
+            location: LocationId("arasaka_lobby"),
+            present: [],
+            intent: "Final battle in the Arasaka lobby.",
+            mechanical_hooks: [],
+            encounter: None,
+            transitions: [
+                (
+                    condition: Always,
+                    target: BeatId("resolution"),
+                ),
+            ],
+        ),
+        (
+            id: BeatId("resolution"),
+            kind: Resolution,
+            location: LocationId("arasaka_lobby"),
+            present: [],
+            intent: "Crew escapes with the data; Fixer pays up.",
+            mechanical_hooks: [],
+            encounter: None,
+            transitions: [],
+        ),
+    ],
+    start_beat: BeatId("hook"),
+)

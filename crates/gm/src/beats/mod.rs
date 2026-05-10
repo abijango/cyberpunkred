@@ -7,5 +7,8 @@
 //!
 //! See `IMPLEMENTATION_PLAN.md` §6 and rulebook pp.395–408.
 
+pub mod loader;
 pub mod schema;
+
+pub use loader::*;
 pub use schema::*;

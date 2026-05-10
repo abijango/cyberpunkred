@@ -10,3 +10,6 @@ repository.workspace = true
 [[bin]]
 name = "content-validator"
 path = "src/main.rs"
+
+[dependencies]
+cpr_gm = { path = "../../crates/gm" }
